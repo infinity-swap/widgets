@@ -11,6 +11,7 @@ interface InputProps {
   value: string | number;
   readOnly?: boolean;
   onBlur?: () => void;
+  logo?: string;
   min?: number;
   onChange: (value: string) => void;
   onInputClick: () => void;
@@ -23,6 +24,7 @@ export default function Input({
   value,
   min,
   onBlur,
+  logo,
   disabled = false,
   readOnly = false,
   disableSelection,
@@ -63,7 +65,7 @@ export default function Input({
           >
             <div className="flex items-center space-x-2">
               <span>
-                <Logo symbol="icp" />
+                <Logo symbol={name} logoURI={logo} />
               </span>
               <span
                 className={`body-primary-semibold text-secondary whitespace-nowrap 
