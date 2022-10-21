@@ -54,7 +54,7 @@ export default function Input({
   return (
     <div>
       <div
-        className={`flex flex-col justify-center bg-secondary-100 px-4 rounded-medium h-[72px] ${className}`}
+        className={`flex flex-col justify-center bg-secondary-100 rounded-xl px-4 rounded-medium h-[72px] ${className}`}
       >
         <div className="flex justify-between items-center w-full">
           <div
@@ -90,7 +90,7 @@ export default function Input({
                 placeholder="0.0"
                 value={isEditing ? value : formatNumber(value)}
                 data-testid={testId}
-                className={`h5-semibold bg-transparent relative w-full text-secondary-black text-right`}
+                className={`h5-semibold bg-transparent relative w-full text-secondary-black text-right outline-none`}
                 type="number"
                 readOnly={readOnly}
                 onChange={(e) =>
