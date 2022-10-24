@@ -1,6 +1,17 @@
 import create, { SetState, GetState } from "zustand";
 import { persist, devtools } from "zustand/middleware";
-import createAuthSlice from "./auth.slice";
+import createAuthSlice, {
+  principalSelector,
+  accountSelector,
+  isUnlockedSelector,
+  activeConnectionSelector,
+  connectedToSelector,
+  setPrincipalSelector,
+  setAccountSelector,
+  setUnlockedSelector,
+  setConnectedToSelector,
+  setActiveConnectionSelector,
+} from "./auth.slice";
 import createSlippageSlice, {
   slippageSelector,
   setSlippageSelector,
@@ -33,5 +44,18 @@ const useStore = create(
   )
 );
 
-export { slippageSelector, setSlippageSelector };
+export {
+  slippageSelector,
+  setSlippageSelector,
+  principalSelector,
+  accountSelector,
+  isUnlockedSelector,
+  activeConnectionSelector,
+  connectedToSelector,
+  setPrincipalSelector,
+  setAccountSelector,
+  setUnlockedSelector,
+  setConnectedToSelector,
+  setActiveConnectionSelector,
+};
 export default useStore;
