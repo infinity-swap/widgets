@@ -67,7 +67,7 @@ const TermsAgreeField = ({
         </div>
       </div>
       {showWarning && (
-        <span className="text-red">
+        <span className="text-red-500 text-sm">
           Please accept terms and conditions first
         </span>
       )}

@@ -22,14 +22,17 @@ import { walletType } from "../../types";
 import TermsAgreeField from "./TermsAgreeField";
 import { ConnectWalletContext } from "../../contexts/ConnectWallet";
 import { Principal } from "@dfinity/principal";
+import Loader from "../Loader";
 
 interface Step1Type {
   connectedTo: string | null;
   currentWalletId: string | null;
-  onWalletConnect: (
-    e: React.ChangeEvent<HTMLInputElement>,
-    wallet: walletType
-  ) => void;
+  onWalletConnect: (wallet: walletType) => void;
+}
+
+interface Step2Type extends Step1Type {
+  loading: boolean;
+  wallet?: walletType;
 }
 
 interface connectionDataToStoreTypes {
@@ -66,6 +69,51 @@ const RenderStep1 = ({
           Learn how to connect your wallet
         </span>
       </a>
+    </>
+  );
+};
+
+const RenderStep2 = ({
+  loading,
+  onWalletConnect,
+  currentWalletId,
+  wallet,
+}: Step2Type) => {
+  return (
+    <>
+      {loading ? (
+        <div className="w-full box-border flex items-center my-4 p-2 rounded-md bg-secondary-100 space-x-2">
+          <Loader />
+          <span className="body-secondary text-secondary-black">
+            Initializing...
+          </span>
+        </div>
+      ) : (
+        <div className="w-full box-border flex items-center my-4 p-2 rounded-[8px] bg-secondary-100 border border-red-500">
+          <span className="body-secondary mr-4 text-red-500">
+            Error connecting
+          </span>
+          <span
+            className="body-secondary text-secondary-black bg-secondary-200 rounded-[8px] p-2 cursor-pointer"
+            onClick={(e) => onWalletConnect(wallet!)}
+          >
+            Try Again
+          </span>
+        </div>
+      )}
+      <div className="flex my-4 p-2 rounded-[8px] bg-secondary-100 items-center">
+        <div className="flex items-center justify-center rounded-full dark:bg-transparent mr-2 bg-white w-[32px] h-[32px] shadow-lg">
+          {wallet?.Icon && <wallet.Icon alt="" className="w-2/3 h-2/3" />}
+        </div>
+        <div className="flex flex-col">
+          <span className="h6-semibold text-black uppercase">
+            {wallet?.name}
+          </span>
+          <span className="body-secondary text-secondary-800">
+            Easy to use browser extension
+          </span>
+        </div>
+      </div>
     </>
   );
 };
@@ -211,16 +259,13 @@ export default function ConnectWallet() {
     }
   };
 
-  const onWalletConnect = (
-    e: React.ChangeEvent<HTMLInputElement>,
-    wallet: walletType
-  ) => {
+  const onWalletConnect = (wallet: walletType) => {
+    console.log(wallet, "clicked");
     if (!termAccepted) {
       setShowWarning(true);
       return;
     }
     setStep(2);
-    e.preventDefault();
     switch (wallet.id) {
       case WALLET_IDS.PLUG:
         handlePlugConnection(wallet);
@@ -231,6 +276,10 @@ export default function ConnectWallet() {
       default:
     }
   };
+
+  const selectedWallet: walletType = WALLETS.find(
+    (wallet) => wallet.id === currentWalletId
+  ) || { id: "", exposedName: "", name: "", Icon: "", installation: "" };
 
   return (
     <Modal isOpen={showModal} onClose={() => setShowModal(false)} zIndex={20}>
@@ -258,6 +307,15 @@ export default function ConnectWallet() {
             connectedTo={connectedTo}
             currentWalletId={currentWalletId}
             onWalletConnect={onWalletConnect}
+          />
+        )}
+        {step === 2 && (
+          <RenderStep2
+            loading={loading}
+            connectedTo={connectedTo}
+            currentWalletId={currentWalletId}
+            onWalletConnect={onWalletConnect}
+            wallet={selectedWallet}
           />
         )}
       </div>

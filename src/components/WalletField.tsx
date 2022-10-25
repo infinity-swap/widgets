@@ -16,12 +16,8 @@ interface WalletFieldType extends WalletFieldWrapperType {
   currentWalletId: string | null;
   wallet: walletType;
   [rest: string]: any;
-  onClick: (e: React.ChangeEvent<HTMLInputElement>, wallet: walletType) => void;
+  onClick: (wallet: walletType) => void;
 }
-
-export const WalletIconWrapper = () => {
-  return <div></div>;
-};
 
 export const WalletFieldWrapper = ({
   children,
@@ -32,7 +28,7 @@ export const WalletFieldWrapper = ({
   const className = clsx(
     isActive ? "bg-secondary-500 justify-between" : "bg-secondary-100",
     disabled ? "cursor-not-allowed" : "cursor-pointer",
-    "flex w-full h-auto p-[5%] my-2 mx-0 text-sm rounded-[8px]"
+    "flex items-center w-full h-auto p-[5%] my-2 mx-0 text-sm rounded-[8px]"
   );
   return (
     <div id={`connect${name}`} className={className}>
@@ -49,22 +45,34 @@ export default function WalletField({
   isActive,
 }: WalletFieldType) {
   return (
-    <WalletFieldWrapper
-      isActive={isActive}
-      disabled={wallet?.disabled}
-      name={wallet?.name}
+    <div
+      onClick={(e) => {
+        if (wallet?.disabled) {
+          return;
+        }
+        if (isActive) {
+          return;
+        }
+        onClick(wallet);
+      }}
     >
-      <div className="flex items-center">
-        {currentWalletId === wallet?.id ? (
-          <div>loading...</div>
-        ) : (
-          <div className="flex items-center justify-center rounded-full dark:bg-transparent mr-2 bg-white w-[32px] h-[32px] shadow-lg">
-            <wallet.Icon alt="" className="w-2/3 h-2/3" />
-          </div>
-        )}
-        <span className="body-primary-semibold">{wallet?.name}</span>
-      </div>
-      {isActive && <RectangleIcon />}
-    </WalletFieldWrapper>
+      <WalletFieldWrapper
+        isActive={isActive}
+        disabled={wallet?.disabled}
+        name={wallet?.name}
+      >
+        <div className="flex items-center">
+          {currentWalletId === wallet?.id ? (
+            <div>loading...</div>
+          ) : (
+            <div className="flex items-center justify-center rounded-full dark:bg-transparent mr-2 bg-white w-[32px] h-[32px] shadow-lg">
+              <wallet.Icon alt="" className="w-2/3 h-2/3" />
+            </div>
+          )}
+          <span className="body-primary-semibold">{wallet?.name}</span>
+        </div>
+        {isActive && <RectangleIcon />}
+      </WalletFieldWrapper>
+    </div>
   );
 }
