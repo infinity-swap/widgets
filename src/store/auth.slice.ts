@@ -24,7 +24,7 @@ const createAuthSlice: StoreSlice<AuthSliceType> = (set, get) => ({
   activeConnection: {},
   setUnlocked: (value) => set({ isUnlocked: value }),
   setConnectedTo: (value) => set({ connectedTo: value }),
-  setActiveConnection: (key, value, reset) => {
+  setActiveConnection: (key, value, reset = false) => {
     if (reset) {
       set({ activeConnection: {} });
     } else {
@@ -32,8 +32,8 @@ const createAuthSlice: StoreSlice<AuthSliceType> = (set, get) => ({
       set({ activeConnection: { ...state.activeConnection, [key]: value } });
     }
   },
-  setPrincipal: (principal: string | null) => set({ principal }),
-  setAccountId: (accountId: string | null) => set({ accountId }),
+  setPrincipal: (principal) => set({ principal }),
+  setAccountId: (accountId) => set({ accountId }),
 });
 
 export default createAuthSlice;
