@@ -1,5 +1,5 @@
 import { ReactComponent as PlugIcon } from "../assets/svg/wallets/plug.svg";
-import { ReactComponent as InfinityWalletIcon } from "../assets/svg/wallets/plug.svg";
+import { ReactComponent as InfinityWalletIcon } from "../assets/svg/wallets/infinitylogo.svg";
 import { walletType } from "../types";
 
 export const WALLET_IDS = {
