@@ -171,7 +171,9 @@ export default function ConnectWallet() {
           return false;
         }
       }
-    } catch (error) {}
+    } catch (error) {
+      console.log("retry error", error);
+    }
     return true;
   };
 
@@ -246,6 +248,7 @@ export default function ConnectWallet() {
           });
         } else {
           // request rejected
+          console.log("rejected");
           setUnlocked(false);
         }
       } catch (error) {
