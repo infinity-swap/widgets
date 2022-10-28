@@ -1,22 +1,25 @@
 import { useQuery } from "react-query";
 import axios from "axios";
+import { MAINNET_LEDGER_CANISTER_ID } from "../shared/constants";
 
 type CanisterIds = { [key: string]: string };
 
-const extractCanisterIds = (data: CanisterIds) => {
-  const canisterIds: CanisterIds = {};
-  Object.entries(data).forEach(([key, value]) => {
+const extractCanisterIds = (data: any) => {
+  const canisterIds: CanisterIds = {
+    ledger: MAINNET_LEDGER_CANISTER_ID,
+  };
+  Object.entries(data).forEach(([key, value]: any) => {
+    const actualValue = value.local ? value.local : value;
     if (/ledger/.test(key)) {
-      canisterIds.ledger = value;
+      canisterIds.ledgerTest = actualValue;
     } else if (["token_factory", "is20-factory"].includes(key)) {
-      canisterIds.token_factory = value;
+      canisterIds.tokenFactory = actualValue;
     } else if (["pair_factory", "pair-factory"].includes(key)) {
-      canisterIds.pair_factory = value;
+      canisterIds.pairFactory = actualValue;
     } else {
-      canisterIds[key] = value;
+      canisterIds[key] = actualValue;
     }
   });
-
   return canisterIds;
 };
 
