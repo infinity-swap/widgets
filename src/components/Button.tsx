@@ -21,13 +21,20 @@ const buttonSizes: any = {
   full: "py-4 w-full",
 };
 
+export interface ButtonProps extends React.ComponentPropsWithoutRef<"button"> {
+  className?: string;
+  size?: string;
+  children?: ReactNode;
+  variant?: string;
+}
+
 export default function Button({
   size = "sm",
   variant = "primary",
   children,
   className,
   ...rest
-}: ButtonType) {
+}: ButtonProps) {
   const sizeProp = size in buttonSizes ? size : "sm";
   const classes = clsx(buttonSizes[sizeProp], className);
   switch (variant) {
@@ -57,7 +64,7 @@ const PrimaryButton = ({
   const defaultStyle =
     "bg-primary-gradient  text-white rounded-xl dark:bg-primary-800 dark:bg-none";
   const hoverStyle =
-    "hover:bg-primary-900 hover:bg-none dark:hover:bg-primary-hover";
+    "hover:bg-primary-800 hover:bg-none dark:hover:bg-primary-hover";
   const disabledStyle =
     "bg-grey-200 dark:bg-secondary-grey-10 border-none text-secondary-800 bg-none dark:border-2 dark:border-grey-100 rounded-xl";
 
