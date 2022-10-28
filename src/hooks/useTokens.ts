@@ -16,6 +16,13 @@ import {
 } from "../ic/idl/ledger/ledger.did";
 import usePools from "./usePools";
 import { PoolStatsType } from "../types";
+import {
+  LEDGER_SYMBOLS,
+  REAL_LEDGER_METADATA,
+  TEST_LEDGER_METADATA,
+} from "../shared/constants";
+import Ic from "../ic";
+import { getIcpPriceUSD } from "../utils";
 
 interface fetchTokensProps {
   tokenFactory: string;
@@ -23,12 +30,79 @@ interface fetchTokensProps {
   ledgerTest: string;
   pools: PoolStatsType[];
 }
-const fetchTokens = ({
+const fetchTokens = async ({
   tokenFactory,
   ledger,
   ledgerTest,
   pools,
-}: fetchTokensProps) => {};
+}: fetchTokensProps) => {
+  const ledgers = [];
+  if (ledger) {
+    ledgers.push({ id: ledger, ...REAL_LEDGER_METADATA });
+  }
+  if (ledgerTest) {
+    ledgers.push({ id: ledgerTest, ...TEST_LEDGER_METADATA });
+  }
+
+  const ledgerIds = ledgers.map((l) => l.id);
+  const tokenIdPrincipals = await Ic.actor<TokenFactoryService>(
+    tokenFactory,
+    TokenFactoryIDL
+  ).get_all();
+  let tokenIds = tokenIdPrincipals.map((tokenId) => tokenId.toText());
+  const tokensInfo = await Promise.all(
+    tokenIds.map((tokenId) => Ic.actor(tokenId, TokenIDL).get_token_info())
+  );
+  let tokensMetadata = tokensInfo.map(({ metadata, ...rest }: any) => {
+    return { ...rest, ...metadata };
+  });
+  tokensMetadata = [...tokensMetadata, ...ledgers];
+
+  tokenIds = [...tokenIds, ...ledgerIds];
+  let tokens = tokenIds.map((tokenId, index) => {
+    const tokenMeta = tokensMetadata[index];
+    const notICP = !LEDGER_SYMBOLS.includes(tokenMeta.symbol);
+    return {
+      id: tokenId,
+      ...tokenMeta,
+      fee: notICP ? tokenMeta.fee : tokenMeta.fee,
+      ...(notICP && { feeTo: tokenMeta.fee_to.toText() }),
+      ...(notICP && { owner: tokenMeta.owner.toText() }),
+    };
+  });
+
+  const icpPrice = await getIcpPriceUSD();
+  if (pools.length) {
+    tokens = tokens.map((token) => {
+      if (token && token.id && !ledgerIds.includes(token.id)) {
+        const [activePool] = pools.filter(
+          (pool) =>
+            (pool.token0 === token.id && ledgerIds.includes(pool.token1)) ||
+            (ledgerIds.includes(pool.token0) && pool.token1 === token.id)
+        );
+
+        const token0_price = Number.isFinite(activePool?.token0_price)
+          ? activePool?.token0_price
+          : 0;
+        const token1_price = Number.isFinite(activePool?.token1_price)
+          ? activePool?.token1_price
+          : 0;
+        if (ledgerIds.includes(activePool?.token0))
+          return { ...token, price: token0_price * icpPrice };
+        if (ledgerIds.includes(activePool?.token1))
+          return { ...token, price: token1_price * icpPrice };
+      }
+      if (ledgerIds.includes(token.id)) {
+        return { ...token, price: icpPrice };
+      }
+      return { ...token, price: 0 };
+    });
+  } else {
+    tokens = tokens.map((token) => ({ ...token, price: token.price ?? 0 }));
+  }
+
+  return tokens;
+};
 
 export default function useTokens() {
   const { ledger, ledgerTest, tokenFactory } = useCanisterIds();
@@ -39,5 +113,5 @@ export default function useTokens() {
     { enabled: !!((ledger || ledgerTest) && tokenFactory) }
   );
 
-  return [];
+  return data ?? [];
 }

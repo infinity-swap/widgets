@@ -25,3 +25,11 @@ export const WALLETS: walletType[] = [
     disabled: true,
   },
 ];
+
+export const getIcpPriceUSD = async () => {
+  const res = await fetch(
+    "https://api.binance.com/api/v3/avgPrice?symbol=ICPUSDT"
+  );
+  const priceJson = await res.json();
+  return Number(priceJson.price);
+};
