@@ -34,6 +34,7 @@ interface Step1Type {
 interface Step2Type extends Step1Type {
   loading: boolean;
   wallet?: walletType;
+  error?: boolean;
 }
 
 interface connectionDataToStoreTypes {
@@ -79,17 +80,19 @@ const RenderStep2 = ({
   onWalletConnect,
   currentWalletId,
   wallet,
+  error,
 }: Step2Type) => {
   return (
     <>
-      {loading ? (
+      {loading && (
         <div className="w-full box-border flex items-center my-4 p-2 rounded-md bg-secondary-100 space-x-2">
           <Loader />
           <span className="body-secondary text-secondary-black">
             Initializing...
           </span>
         </div>
-      ) : (
+      )}
+      {error && (
         <div className="w-full box-border flex items-center my-4 p-2 rounded-[8px] bg-secondary-100 border border-red-500">
           <span className="body-secondary mr-4 text-red-500">
             Error connecting
@@ -120,12 +123,17 @@ const RenderStep2 = ({
 };
 
 export default function ConnectWallet() {
-  const { forced, toggleConnectModal, showModalType } =
-    useContext(ConnectWalletContext);
+  const [showError, setShowError] = useState(false);
+  const {
+    forced,
+    toggleConnectModal,
+    showModalType,
+    walletStep,
+    setWalletStep,
+  } = useContext(ConnectWalletContext);
   const [loading, setLoading] = useState<boolean>(false);
   const [currentWalletId, setCurrentWalletId] = useState<string | null>(null);
   const [showWarning, setShowWarning] = useState(false);
-  const [step, setStep] = useState<number>(1);
   const userWallet = useUserWalletState();
   const { setWallet } = useUserWalletDispatch();
   const principalId = useStore(principalSelector);
@@ -270,7 +278,7 @@ export default function ConnectWallet() {
       setShowWarning(true);
       return;
     }
-    setStep(2);
+    setWalletStep(2);
     switch (wallet.id) {
       case WALLET_IDS.PLUG:
         handlePlugConnection(wallet);
@@ -287,8 +295,10 @@ export default function ConnectWallet() {
   ) || { id: "", exposedName: "", name: "", Icon: "", installation: "" };
 
   const onClose = () => {
-    setStep(1);
+    setWalletStep(1);
+    setLoading(false);
     toggleConnectModal("");
+    setCurrentWalletId(null);
   };
 
   return (
@@ -301,26 +311,27 @@ export default function ConnectWallet() {
         <Modal.Header title="Select Wallet" onClose={() => onClose()} />
         <div>
           <TermsAgreeField
-            step={step}
+            step={walletStep}
             termAccepted={termAccepted}
             setTermAccepted={setTermAccepted}
             showWarning={showWarning}
             setShowWarning={setShowWarning}
           />
-          {step === 1 && (
+          {walletStep === 1 && (
             <RenderStep1
               connectedTo={connectedTo}
               currentWalletId={currentWalletId}
               onWalletConnect={onWalletConnect}
             />
           )}
-          {step === 2 && (
+          {walletStep === 2 && (
             <RenderStep2
               loading={loading}
               connectedTo={connectedTo}
               currentWalletId={currentWalletId}
               onWalletConnect={onWalletConnect}
               wallet={selectedWallet}
+              error={showError}
             />
           )}
         </div>

@@ -9,6 +9,7 @@ export const ConnectWalletProvider = ({
 }) => {
   const [showModalType, toggleConnectModal] = useState("");
   const [forced, setForced] = useState(false);
+  const [walletStep, setWalletStep] = useState(1);
 
   const value = useMemo(
     () => ({
@@ -16,8 +17,17 @@ export const ConnectWalletProvider = ({
       forced,
       setForced,
       toggleConnectModal,
+      walletStep,
+      setWalletStep,
     }),
-    [toggleConnectModal, showModalType, forced, setForced]
+    [
+      toggleConnectModal,
+      showModalType,
+      forced,
+      setForced,
+      walletStep,
+      setWalletStep,
+    ]
   );
 
   return (

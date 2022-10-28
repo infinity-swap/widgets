@@ -2,6 +2,7 @@ import clsx from "clsx";
 import React, { ReactNode } from "react";
 import { ReactComponent as RectangleIcon } from "../assets/svg/primary-online-rectangle.svg";
 import { walletType } from "../types";
+import Loader from "./Loader";
 
 interface WalletFieldWrapperType {
   children?: ReactNode;
@@ -63,7 +64,9 @@ export default function WalletField({
       >
         <div className="flex items-center">
           {currentWalletId === wallet?.id ? (
-            <div>loading...</div>
+            <div className="pr-1">
+              <Loader />
+            </div>
           ) : (
             <div className="flex items-center justify-center rounded-full dark:bg-transparent mr-2 bg-white w-[32px] h-[32px] shadow-lg">
               <wallet.Icon alt="" className="w-2/3 h-2/3" />

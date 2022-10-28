@@ -28,7 +28,7 @@ export const getWallet = (id: string | null) => {
 };
 
 export default function Account() {
-  const { forced, toggleConnectModal, showModalType } =
+  const { forced, toggleConnectModal, showModalType, setWalletStep } =
     useContext(ConnectWalletContext);
   const connectedTo = useStore(connectedToSelector);
   const principalId = useStore(principalSelector);
@@ -44,6 +44,7 @@ export default function Account() {
       setActiveConnection("", null, true);
       setAccountId("");
       toggleConnectModal("");
+      setWalletStep(1);
       if ((window as any)?.ic?.infinityWallet) {
         (window as any).ic.infinityWallet.disconnect();
       }
