@@ -23,6 +23,7 @@ import TermsAgreeField from "./TermsAgreeField";
 import { ConnectWalletContext } from "../../contexts/ConnectWallet";
 import { Principal } from "@dfinity/principal";
 import Loader from "../Loader";
+import useCanisterIds from "../../hooks/useCanisterIds";
 
 interface Step1Type {
   connectedTo: string | null;
@@ -136,10 +137,11 @@ export default function ConnectWallet() {
   const setActiveConnection = useStore(setActiveConnectionSelector);
   const activeConnection = useStore(activeConnectionSelector);
   const [termAccepted, setTermAccepted] = useState(!!principalId);
+  const canisterIds = useCanisterIds();
 
   const connectionPayload = {
     host: process.env.REACT_APP_IC_HOST,
-    //whitelist: [canisterIds.tokenFactory],
+    whitelist: [canisterIds.tokenFactory],
   };
 
   const setConnectionDataToStore = ({
@@ -288,6 +290,7 @@ export default function ConnectWallet() {
     setStep(1);
     toggleConnectModal("");
   };
+
   return (
     <Modal
       isOpen={showModalType === "connectWallet"}
