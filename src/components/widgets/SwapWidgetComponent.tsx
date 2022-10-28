@@ -8,14 +8,54 @@ import Button from "../Button";
 import { ConnectWalletContext } from "../../contexts/ConnectWallet";
 import ConnectWallet from "../ConnectWallet";
 import Account from "../Account";
+import SwapSelectPair from "../SwapSelectPair";
+import AppWrapper from "../AppWrapper";
 
-export default function SwapWidget() {
-  const [isOpen, setIsOpen] = useState(true);
+const WhichToken = {
+  IN: 1,
+  OUT: 2,
+};
+
+export default function SwapWidgetComponent({
+  isOpen,
+  onClose,
+}: {
+  isOpen: boolean;
+  onClose: () => void;
+}) {
+  const [selectPair, toggleSelectPair] = useState<boolean>(false);
+
   const { forced, toggleConnectModal, showModalType } =
     useContext(ConnectWalletContext);
   const storedSlippage = useStore(slippageSelector);
   const principalId = useStore(principalSelector);
-  const walletContext = useContext(ConnectWalletContext);
+  const {
+    resetField,
+    control,
+    setValue,
+    watch,
+    getValues,
+    formState: { errors, isValid },
+  } = useForm({
+    mode: "onChange",
+    defaultValues: {
+      inToken: undefined,
+      outToken: undefined,
+      changeToken: WhichToken.IN,
+      slippage: storedSlippage,
+      inAmount: 0,
+      outAmount: 0,
+    },
+  });
+
+  const onDropDownClick = (val: number) => {
+    if (!principalId) {
+      return showWalletHandler();
+    }
+
+    setValue("changeToken", val);
+    toggleSelectPair(true);
+  };
 
   const showWalletHandler = () => {
     if (!principalId) {
@@ -30,7 +70,12 @@ export default function SwapWidget() {
     <>
       <ConnectWallet />
       <Account />
-      <Modal isOpen={isOpen} onClose={() => setIsOpen(false)}>
+      <SwapSelectPair
+        isOpen={selectPair}
+        onChange={() => {}}
+        onClose={() => toggleSelectPair((prev) => !prev)}
+      />
+      <Modal isOpen={isOpen} onClose={() => onClose()}>
         <div className="bg-white px-4 pt-5 pb-4 sm:p-4 sm:pb-4 w-full md:w-[360px]">
           {/* Header */}
           <div>
@@ -45,7 +90,7 @@ export default function SwapWidget() {
               <Input
                 name="icp"
                 testId="swap-input-from"
-                onInputClick={() => {}}
+                onInputClick={() => onDropDownClick(WhichToken.IN)}
                 onChange={() => {}}
                 value={1}
               />
@@ -59,7 +104,15 @@ export default function SwapWidget() {
                 value={1}
               />
             </div>
-            <Button className="w-full">Connect Wallet</Button>
+            <div className="mt-7">
+              {!principalId ? (
+                <Button onClick={showWalletHandler} className="w-full">
+                  Connect Wallet
+                </Button>
+              ) : (
+                <Button className="w-full">Swap</Button>
+              )}
+            </div>
           </div>
         </div>
       </Modal>
