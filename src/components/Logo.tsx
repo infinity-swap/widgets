@@ -6,18 +6,27 @@ interface LogoProps {
 }
 
 export default function Logo({ logoURI, symbol }: LogoProps) {
-  let className = `bg-white h-[20px] w-[20px] rounded-full`;
+  let className = `bg-white min-h-[20px] min-w-[20px] h-[20px] w-[20px] rounded-full`;
   if (logoURI) {
     return <img src={logoURI} alt={`${symbol}-icon`} className={className} />;
   }
-  if (symbol && CoinIcons[symbol]) {
+  if (symbol && CoinIcons[symbol.toLowerCase()]) {
     return (
       <img
-        src={CoinIcons[symbol]}
+        src={CoinIcons[symbol.toLowerCase()]}
         alt={`${symbol}-icon`}
         className={className}
       />
     );
   }
-  return null;
+  if (symbol?.toLowerCase() === "select") {
+    symbol = "S";
+  }
+  return (
+    <img
+      src={`https://avatars.dicebear.com/api/initials/${symbol}.svg`}
+      alt={`${symbol}-icon`}
+      className={className}
+    />
+  );
 }
