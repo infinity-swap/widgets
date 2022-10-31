@@ -15,7 +15,7 @@ import {
   _SERVICE as LedgerService,
 } from "../ic/idl/ledger/ledger.did";
 import usePools from "./usePools";
-import { PoolStatsType } from "../types";
+import { PoolStatsType, Token } from "../types";
 import {
   LEDGER_SYMBOLS,
   REAL_LEDGER_METADATA,
@@ -23,12 +23,18 @@ import {
 } from "../shared/constants";
 import Ic from "../ic";
 import { getIcpPriceUSD } from "../utils";
+import { useStore } from "zustand";
+import { accountSelector, principalSelector } from "../store";
 
 interface fetchTokensProps {
   tokenFactory: string;
   ledger: string;
   ledgerTest: string;
   pools: PoolStatsType[];
+}
+interface useTokensWithUserBalanceType {
+  principalId: string | null;
+  accountIdentifier: string | null;
 }
 const fetchTokens = async ({
   tokenFactory,
@@ -114,4 +120,75 @@ export default function useTokens() {
   );
 
   return data ?? [];
+}
+
+const getUserBalance = async (
+  principal: string | null,
+  accountId: string | null,
+  token: Token
+) => {
+  let balance: number | bigint = 0;
+  try {
+    const isICP = LEDGER_SYMBOLS.includes(token?.symbol);
+    if (isICP && accountId) {
+      const { e8s = 0 } = await Ic.actor<LedgerService>(
+        token.id,
+        LedgerIDL
+      ).account_balance_dfx({ account: accountId });
+      balance = e8s;
+    } else if (!isICP && principal) {
+      const amount: bigint = await Ic.actor<TokenService>(
+        token.id,
+        TokenIDL
+      ).icrc1_balance_of({
+        owner: Principal.fromText(principal),
+        subaccount: [],
+      });
+      balance = amount;
+    }
+  } catch (error) {}
+  return balance;
+};
+
+export function useTokensWithUserBalance({
+  principalId = null,
+  accountIdentifier = null,
+}: useTokensWithUserBalanceType) {
+  const principal = principalId;
+  const accountId = accountIdentifier;
+  const tokens = useTokens();
+  const [loading, setLoading] = useState(true);
+  const [tokensWithBalance, setTokensWithBalance] = useState(() =>
+    tokens.map((token) => ({ ...token, balance: 0 }))
+  );
+
+  useEffect(() => {
+    let mounted = true;
+    if ((principal || accountId) && tokens.length) {
+      (async () => {
+        const promises = tokens.map((token) => {
+          return getUserBalance(principal, accountId, token);
+        });
+        const balances = await Promise.all(promises);
+        if (mounted) {
+          const tokensB = tokens.map((token, index) => ({
+            ...token,
+            balance: balances[index],
+          }));
+          setTokensWithBalance(tokensB);
+          setLoading(false);
+        }
+      })();
+    } else if (!principal && !accountId && tokens.length) {
+      const btokens = tokens.map((token) => ({ ...token, balance: 0 }));
+      setTokensWithBalance(btokens);
+      setLoading(false);
+    }
+
+    return () => {
+      mounted = false;
+    };
+  }, [principal, accountId, tokens]);
+
+  return { tokens: tokensWithBalance, loading };
 }

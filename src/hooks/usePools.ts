@@ -1,7 +1,6 @@
 import { useQuery } from "react-query";
 import useCanisterIds from "./useCanisterIds";
 
-// import PairFactoryIDL from "../ic/idl/pair_factory/pair_factory.did";
 import {
   idlFactory as PairFactoryIDL,
   _SERVICE as PairFactoryService,
@@ -10,16 +9,27 @@ import {
   idlFactory as TokenIDL,
   _SERVICE as TokenService,
 } from "../ic/idl/token/token.did.js";
-import PairIDL from "../ic/idl/pair/pair.did";
+import {
+  idlFactory as PairIDL,
+  _SERVICE as PairService,
+} from "../ic/idl/pair/pair.did";
 import Ic from "../ic";
 import { IC_ENVIRON } from "../shared/constants";
 import { Principal } from "@dfinity/principal";
 import { PoolStatsType } from "../types";
+import { useMemo } from "react";
 
 interface fetchPoolsProps {
   pairFactory: string;
   ledger: string;
   ledgerTest: string;
+}
+
+interface useFindPoolPayload {
+  token0: string;
+  token1: string;
+  poolId: string;
+  fetchWithTokens?: boolean;
 }
 
 const fetchPools = async ({
@@ -31,10 +41,9 @@ const fetchPools = async ({
     pairFactory,
     PairFactoryIDL
   ).get_all();
-  console.log("pairs", pairs);
 
   const pairStats = await Promise.all(
-    pairs.map((pair) => Ic.actor(pair.toText(), PairIDL).stats())
+    pairs.map((pair) => Ic.actor<PairService>(pair.toText(), PairIDL).stats())
   );
 
   let pools: PoolStatsType[] = pairStats.map((stats: any, index) => ({
@@ -79,7 +88,6 @@ const fetchPools = async ({
       symbol: `${symbol0} / ${symbol1}`,
     };
   });
-  console.log("pools", pools);
   return pools;
 };
 
@@ -97,4 +105,26 @@ export default function usePools() {
   );
 
   return data ?? [];
+}
+
+export function useFindPool({
+  token0,
+  token1,
+  poolId,
+  fetchWithTokens = false,
+}: useFindPoolPayload) {
+  const pools = usePools();
+  const found = useMemo(() => {
+    let selectedPool: PoolStatsType | undefined = pools[0]!;
+    if (poolId && !fetchWithTokens) {
+      selectedPool = pools.find((pool) => pool.id === poolId);
+    } else if (token0 && token1) {
+      const poolFound = pools.find((pool) => {
+        return pool.token0 === token0 && pool.token1 === token1;
+      });
+      selectedPool = poolFound;
+    }
+    return selectedPool;
+  }, [token0, token1, poolId, pools]);
+  return found;
 }
