@@ -1,4 +1,4 @@
-export default ({ IDL }) => {
+export const idlFactory = ({ IDL }) => {
   const Standard = IDL.Variant({ Erc20: IDL.Null, Ledger: IDL.Null });
   const TokenInfo = IDL.Record({
     principal: IDL.Principal,
