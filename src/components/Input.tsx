@@ -1,7 +1,7 @@
 import { useState } from "react";
 import Logo from "./Logo";
 import { ReactComponent as Arrow } from "../assets/svg/dropdown-arrow.svg";
-
+import { formatNum } from "../utils";
 interface InputProps {
   className?: string;
   name: string;
@@ -49,8 +49,22 @@ export default function Input({
     return onInputClick();
   };
 
-  const formatNumber = (val: string | number) => {
-    return val;
+  const formatNumber = (num: number | string) => {
+    if (!num) {
+      return "";
+    }
+
+    const formatting =
+      num > 0.01
+        ? {
+            decimals: 2,
+          }
+        : {
+            decimals: 8,
+            trimMantissa: true,
+          };
+
+    return formatNum({ value: num, ...formatting });
   };
 
   return (
