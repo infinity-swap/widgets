@@ -5,7 +5,9 @@ function App() {
   return (
     <div className="App">
       <SwapWidget isOpen={isOpen} onClose={() => setIsOpen(false)} />
-      <button onClick={() => setIsOpen(true)}>Open modal</button>
+      <div className="flex justify-center items-center h-screen w-full">
+        <button onClick={() => setIsOpen(true)}>Click to use Swap</button>
+      </div>
     </div>
   );
 }
