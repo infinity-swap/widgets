@@ -17,3 +17,15 @@ export interface PoolStatsType {
   weights_can_change: boolean;
   total_supply: bigint;
 }
+
+export interface swapParamsType {
+  token_in: Principal;
+  token_out: Principal;
+  pools: {
+    fee: bigint;
+    pool: Principal;
+    amount_out: bigint;
+    amount_in: bigint;
+    slippage: bigint;
+  }[];
+}
