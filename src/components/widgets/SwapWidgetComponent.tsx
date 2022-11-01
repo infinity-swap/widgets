@@ -19,29 +19,52 @@ import {
 } from "../../hooks/useSwapParameters";
 import debounce from "lodash.debounce";
 import { ReactComponent as ArrowDownIcon } from "../../assets/svg/arrow-down.svg";
-import { formatNum, toActual, toDecimal } from "../../utils";
+import { formatNum, parsePairError, toActual, toDecimal } from "../../utils";
 import Loader from "../Loader";
 import { defaultDecimal, LEDGER_SYMBOLS } from "../../shared/constants";
 import useCanisterIds from "../../hooks/useCanisterIds";
 import ProgressTracker, { useProgressTracker } from "../ProgressTracker";
 import { useFindPool } from "../../hooks/usePools";
 import {
+  idlFactory as TokenIDL,
+  _SERVICE as TokenService,
+  Result_5 as IcrcTransferResponse,
+} from "../../ic/idl/token/token.did";
+import {
   idlFactory as PairIDL,
   _SERVICE as PairService,
+  PairError,
+  Result_5 as ReceiveIcpResponse,
+  Result_2 as ReceiveIcrcResponse,
+  Result_7 as SwapResponse,
+  SwapDetails,
 } from "../../ic/idl/pair/pair.did";
 import {
+  idlFactory as PairFactoryIDL,
+  _SERVICE as PairFactoryService,
+} from "../../ic/idl/pair_factory/pair_factory.did";
+import {
+  BlockHeight,
   idlFactory as LedgerIDL,
   _SERVICE as LedgerService,
 } from "../../ic/idl/ledger/ledger.did";
-import { Token } from "../../types";
+import { PairErrorResponse, Token } from "../../types";
+import { Principal } from "@dfinity/principal";
+import Ic from "../../ic";
+import { SubAccount } from "../../ic/account";
 
 const WhichToken = {
   IN: 1,
   OUT: 2,
 };
 
-interface defaultValuesType {
+interface FormValues {
   inToken: Token;
+  outToken: Token;
+  changeToken: number;
+  slippage: number | null;
+  inAmount: number;
+  outAmount: number;
 }
 
 const SwapSteps = [
@@ -88,9 +111,8 @@ export default function SwapWidgetComponent({
   const [selectPair, toggleSelectPair] = useState<boolean>(false);
   const [pTracker, pTrackerDispatch] = useProgressTracker(initProgressTracker);
   const canisterIds = useCanisterIds();
-  const [poolId, setPoolId] = useState(null);
-  const { forced, toggleConnectModal, showModalType } =
-    useContext(ConnectWalletContext);
+  const [poolId, setPoolId] = useState<string | null>(null);
+  const { toggleConnectModal } = useContext(ConnectWalletContext);
   const storedSlippage = useStore(slippageSelector);
   const principalId = useStore(principalSelector);
   const {
@@ -100,11 +122,11 @@ export default function SwapWidgetComponent({
     watch,
     getValues,
     formState: { errors, isValid },
-  } = useForm({
+  } = useForm<FormValues>({
     mode: "onChange",
     defaultValues: {
-      inToken: { id: "", fee: 0 },
-      outToken: { id: "", fee: 0 },
+      inToken: { id: "", fee: BigInt(0), decimals: 0 },
+      outToken: { id: "", fee: BigInt(0), decimals: 0 },
       changeToken: WhichToken.IN,
       slippage: storedSlippage,
       inAmount: 0,
@@ -207,11 +229,12 @@ export default function SwapWidgetComponent({
         setEmptyLiquidity(false);
       }
     } catch (error) {
+      let message;
       console.log("fw err", error);
-      if (error?.message?.includes("doesn't have any liquidity")) {
-        /*  notification.error({
-          description: "This pool has no liquidity",
-        }); */
+
+      if (error instanceof Error) message = error?.message;
+      if (message?.includes("doesn't have any liquidity")) {
+        // pass function to handle error message
         console.log(error);
         setEmptyLiquidity(true);
       }
@@ -228,7 +251,9 @@ export default function SwapWidgetComponent({
 
       setFetchingPrice(true);
 
-      const outAmountToSwap = toDecimal(currOutAmount, currOutToken?.decimals);
+      const outAmountToSwap = BigInt(
+        toDecimal(currOutAmount, currOutToken?.decimals)
+      );
 
       const bestPool = await inSwapParameterCall({
         inToken: currInToken.id,
@@ -251,10 +276,9 @@ export default function SwapWidgetComponent({
       }
     } catch (error) {
       console.log("rv err", error);
-      if (error?.message?.includes("doesn't have any liquidity")) {
-        /* notification.error({
-          description: "This pool has no liquidity",
-        }); */
+      let message;
+      if (error instanceof Error) message = error?.message;
+      if (message?.includes("doesn't have any liquidity")) {
         setEmptyLiquidity(true);
         console.log(error);
       }
@@ -263,7 +287,7 @@ export default function SwapWidgetComponent({
     }
   }, 1000);
 
-  const onSelectToken = async (token) => {
+  const onSelectToken = async (token: Token) => {
     if (changeToken === WhichToken.IN) {
       setValue("inToken", token);
       inSwapParameters();
@@ -273,7 +297,7 @@ export default function SwapWidgetComponent({
     }
   };
 
-  const onFilter = (token) => {
+  const onFilter = (token: Token) => {
     return token.id !== inToken?.id && token.id !== outToken?.id;
   };
 
@@ -310,11 +334,12 @@ export default function SwapWidgetComponent({
       const inAmountDp = sToken.inAmount;
       const outAmountDp = sToken.outAmount;
 
-      let inAmountToSend = toDecimal(inAmountDp, sToken.inToken?.decimals ?? 0);
-      inAmountToSend = BigInt(inAmountToSend);
+      let inAmountToSend = BigInt(
+        toDecimal(inAmountDp, sToken.inToken?.decimals ?? 0)
+      );
 
       const slippagePct = slippage ? slippage / 100 : 1.0;
-      const actualAmountIn = inAmountToSend - BigInt(sToken.inToken.fee);
+      const actualAmountIn = inAmountToSend - BigInt(sToken.inToken.fee!);
       const swapOptions = [
         {
           swap_out_estimate: toDecimal(outAmountDp, sToken.outToken?.decimals),
@@ -336,7 +361,7 @@ export default function SwapWidgetComponent({
       // Add Approval chain
       if (!activePool) {
         // 1. A token must be sent to the Pair using the approve and transferFrom flow
-        const [pair] = await Ic.actor(
+        const [pair] = await Ic.actor<PairFactoryService>(
           canisterIds.pairFactory,
           PairFactoryIDL
         ).get_pairs(
@@ -349,7 +374,7 @@ export default function SwapWidgetComponent({
 
       if (activePool) {
         // connect to wallet & whitelist the canisters specified
-        await window.ic.infinityWallet.requestConnect({
+        await (window as any)?.ic.infinityWallet.requestConnect({
           whitelist: [
             canisterIds.pairFactory,
             sToken.inToken.id,
@@ -358,7 +383,7 @@ export default function SwapWidgetComponent({
           ],
         });
 
-        const pairActor = await window.ic.infinityWallet.createActor({
+        const pairActor = await (window as any)?.ic.infinityWallet.createActor({
           canisterId: activePool,
           interfaceFactory: PairIDL,
         });
@@ -388,10 +413,10 @@ export default function SwapWidgetComponent({
                   },
                 },
               ],
-              onSuccess: async (res) => {
+              onSuccess: async (res: BlockHeight) => {
                 // console.log("1st token send_dfx onSuccess", res);
               },
-              onFail: (res) => {
+              onFail: (res: BlockHeight) => {
                 console.log("1st token send_dfx onFail", res);
 
                 pTrackerDispatch({
@@ -407,10 +432,10 @@ export default function SwapWidgetComponent({
               canisterId: activePool,
               methodName: "receive_icp",
               args: [false],
-              onSuccess: async (res) => {
+              onSuccess: async (res: ReceiveIcpResponse) => {
                 pTrackerDispatch({ type: "next" });
               },
-              onFail: (res) => {
+              onFail: (res: ReceiveIcpResponse) => {
                 console.log("1st token receive_icp onFail", res);
                 pTrackerDispatch({
                   type: "error",
@@ -432,7 +457,9 @@ export default function SwapWidgetComponent({
                 {
                   to: {
                     owner: Principal.fromText(activePool),
-                    subaccount: [SubAccount.fromPrincipal(principal).toArray()],
+                    subaccount: [
+                      SubAccount.fromPrincipal(principalId).toArray(),
+                    ],
                   },
                   fee: [],
                   memo: [],
@@ -441,10 +468,10 @@ export default function SwapWidgetComponent({
                   amount: inAmountToSend,
                 },
               ],
-              onSuccess: async (res) => {
+              onSuccess: async (res: IcrcTransferResponse) => {
                 // console.log("1st token icrc1_transfer onSuccess", res);
               },
-              onFail: (res) => {
+              onFail: (res: IcrcTransferResponse) => {
                 console.log("1st token icrc1_transfer onFail", res);
                 pTrackerDispatch({
                   type: "error",
@@ -459,14 +486,14 @@ export default function SwapWidgetComponent({
               canisterId: activePool,
               methodName: "receive_icrc1",
               args: [Principal.fromText(sToken.inToken.id), inAmountToSend],
-              onSuccess: async (res) => {
+              onSuccess: async (res: ReceiveIcrcResponse) => {
                 // console.log("1st token receive_icrc1 onSuccess", res);
 
                 // move on the swap step
 
                 pTrackerDispatch({ type: "next" });
               },
-              onFail: (res) => {
+              onFail: (res: ReceiveIcrcResponse) => {
                 console.log("1st token transfer_from onFail", res);
 
                 pTrackerDispatch({
@@ -481,14 +508,14 @@ export default function SwapWidgetComponent({
         }
 
         let refund = false;
-        await window.ic.infinityWallet.batchTransactions([
+        await (window as any).ic.infinityWallet.batchTransactions([
           ...inTokenTxs,
           {
             idl: PairIDL,
             canisterId: activePool,
             methodName: "swap",
             args: swapArguments,
-            onSuccess: (res) => {
+            onSuccess: (res: { Ok: SwapDetails; Err: PairErrorResponse }) => {
               const { Ok, Err } = res;
 
               if (Ok) {
@@ -498,18 +525,21 @@ export default function SwapWidgetComponent({
                   swap_in_amounts: inAmounts,
                 } = Ok;
 
-                let [swapInAmount] = inAmounts.filter((val) => !!val);
-                let [swapOutAmount] = outAmounts.filter((val) => !!val);
+                const [swapInAmount] = inAmounts.filter((val) => !!val);
+                const [swapOutAmount] = outAmounts.filter((val) => !!val);
 
-                refund = !!tReserves.reduce((a, b) => a + b, 0n);
+                refund = !!tReserves.reduce((a, b) => a + b, BigInt(0));
 
-                swapInAmount = toActual(swapInAmount, sToken.inToken?.decimals);
-                swapOutAmount = toActual(
+                const swapInAmountNumber = toActual(
+                  swapInAmount,
+                  sToken.inToken?.decimals!
+                );
+                const swapOutAmountNumber = toActual(
                   swapOutAmount,
-                  sToken.outToken?.decimals
+                  sToken.outToken?.decimals!
                 );
 
-                const title = `Swapped ${swapInAmount} ${sToken.inToken.symbol} for ${swapOutAmount} ${sToken.outToken.symbol}`;
+                const title = `Swapped ${swapInAmountNumber} ${sToken.inToken.symbol} for ${swapOutAmountNumber} ${sToken.outToken.symbol}`;
                 pTrackerDispatch({
                   type: "next",
                   payload: {
@@ -536,7 +566,10 @@ export default function SwapWidgetComponent({
                 });
               }
             },
-            onFail: async (res) => {
+            onFail: async (res: {
+              Ok: SwapDetails;
+              Err: PairErrorResponse;
+            }) => {
               console.log("swap onFail", res);
               pTrackerDispatch({
                 type: "error",
@@ -573,7 +606,9 @@ export default function SwapWidgetComponent({
           } catch (_) {
             pTrackerDispatch({
               type: "error",
-              title: "Failed to refund tokens left in transit",
+              payload: {
+                title: "Failed to refund tokens left in transit",
+              },
             });
           }
         }
@@ -588,7 +623,7 @@ export default function SwapWidgetComponent({
     }
   };
 
-  const enoughTokenBalance = (value, type) => {
+  const enoughTokenBalance = (value: number, type: number) => {
     const token = type === WhichToken.IN ? inToken : outToken;
     const balance = token?.balance ?? 0;
 
@@ -622,6 +657,25 @@ export default function SwapWidgetComponent({
 
   const onRequestClose = () => {
     pTrackerDispatch({ type: "reset", payload: initProgressTracker });
+  };
+
+  const onClickMax = (token: Token) => {
+    const fee = Number(token?.fee || 0) + 0.1 * Number(token?.fee || 0);
+    let balance = Number(token?.balance) - fee;
+    balance = formatNum({
+      value: toActual(balance, token?.decimals || defaultDecimal),
+      decimals: 2,
+      truncate: true,
+    });
+
+    if (toggleSwitch) {
+      setValue("outAmount", balance, {
+        shouldValidate: true,
+      });
+    }
+    if (!toggleSwitch) {
+      setValue("inAmount", balance, { shouldValidate: true });
+    }
   };
 
   return (
@@ -683,7 +737,7 @@ export default function SwapWidgetComponent({
                     logo={inToken?.logo}
                     name={inToken?.symbol ?? "Select"}
                     value={field.value}
-                    min="0"
+                    min={0}
                     onInputClick={() => onDropDownClick(WhichToken.IN)}
                   />
                 )}
@@ -695,7 +749,6 @@ export default function SwapWidgetComponent({
               >
                 <div className="bg-primary-200 dark:bg-dark-200 rounded-small">
                   <ArrowDownIcon
-                    alt="Arrow"
                     className={`fill-primary-900 dark:fill-white arrow w-[24px] h-[24px] ${
                       toggleSwitch ? "rotate-[-360deg]" : ""
                     }`}
@@ -740,7 +793,7 @@ export default function SwapWidgetComponent({
                     logo={outToken?.logo}
                     name={outToken?.symbol ?? "Select"}
                     value={field.value}
-                    min="0"
+                    min={0}
                     onInputClick={() => onDropDownClick(WhichToken.OUT)}
                   />
                 )}
@@ -786,7 +839,7 @@ export default function SwapWidgetComponent({
       </Modal>
       <ProgressTracker
         isOpen={pTracker.open}
-        onRequestClose={onRequestClose}
+        onClose={onRequestClose}
         steps={pTracker.steps}
         activeStep={pTracker.activeStep}
         message={pTracker.title}

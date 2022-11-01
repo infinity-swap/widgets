@@ -50,7 +50,7 @@ function init(
 
 function reducer(
   state: initialStateType,
-  action: { type: string; payload: any }
+  action: { type: string; payload?: stepType }
 ) {
   const payload = action.payload ?? {};
   let activeStep: number = 0;

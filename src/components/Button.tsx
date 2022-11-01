@@ -26,11 +26,13 @@ export interface ButtonProps extends React.ComponentPropsWithoutRef<"button"> {
   size?: string;
   children?: ReactNode;
   variant?: string;
+  applyDisabledStyle?: boolean;
 }
 
 export default function Button({
   size = "sm",
   variant = "primary",
+  applyDisabledStyle = false,
   children,
   className,
   ...rest
@@ -40,14 +42,22 @@ export default function Button({
   switch (variant) {
     case "secondary":
       return (
-        <SecondaryButton className={classes} {...rest}>
+        <SecondaryButton
+          className={classes}
+          applyDisabledStyle={applyDisabledStyle}
+          {...rest}
+        >
           {children}
         </SecondaryButton>
       );
 
     default:
       return (
-        <PrimaryButton className={classes} {...rest}>
+        <PrimaryButton
+          applyDisabledStyle={applyDisabledStyle}
+          className={classes}
+          {...rest}
+        >
           {children}
         </PrimaryButton>
       );

@@ -23,8 +23,6 @@ import {
 } from "../shared/constants";
 import Ic from "../ic";
 import { getIcpPriceUSD } from "../utils";
-import { useStore } from "zustand";
-import { accountSelector, principalSelector } from "../store";
 
 interface fetchTokensProps {
   tokenFactory: string;

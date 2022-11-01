@@ -1,7 +1,8 @@
 import { ReactComponent as PlugIcon } from "../assets/svg/wallets/plug.svg";
 import { ReactComponent as InfinityWalletIcon } from "../assets/svg/wallets/infinitylogo.svg";
-import { walletType } from "../types";
+import { PairErrorResponse, walletType } from "../types";
 import numbro from "numbro";
+import { defaultDecimal } from "../shared/constants";
 
 export const WALLET_IDS = {
   PLUG: "plug",
@@ -82,7 +83,8 @@ export const formatNum = ({
     : formattedNumber;
 };
 
-export const isUndefined = (value: any) => typeof value === "undefined";
+export const isUndefined = (value: number | string | undefined) =>
+  typeof value === "undefined";
 
 const getFlooredFixed = (value: any, decimals: any) => {
   return (Math.floor(value * 10 ** decimals) / 10 ** decimals).toFixed(
@@ -90,9 +92,29 @@ const getFlooredFixed = (value: any, decimals: any) => {
   );
 };
 
+export const parsePairError = (error: PairErrorResponse) => {
+  let keys: string[] = Object.keys(error);
+  // if (error instanceof Error) keys = Object.keys(error);
+
+  if (keys.includes("InsufficientLiquidity")) {
+    return "Insufficient liquidity provided";
+  }
+  if (keys.includes("ExpectedSwapAmountLow")) {
+    const amount = toActual(error?.ExpectedSwapAmountLow[0], defaultDecimal);
+    const expectedAmount = toActual(
+      error?.ExpectedSwapAmountLow[1],
+      defaultDecimal
+    );
+    return `Expected swap amount was low. Got ${amount} instead of ${expectedAmount} `;
+  }
+  if (keys.includes("InsufficientTransitTokens")) {
+    return "Insufficient tokens in transit";
+  }
+};
+
 export const toDecimal = (
   amount: string | number,
-  decimal: string | number
+  decimal: string | number = 0
 ) => {
   return Math.round(Number(amount) * 10 ** Number(decimal ?? 0));
 };

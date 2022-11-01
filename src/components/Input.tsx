@@ -10,11 +10,14 @@ interface InputProps {
   disabled?: boolean;
   value: string | number;
   readOnly?: boolean;
-  onBlur?: () => void;
+  showMax?: boolean;
   logo?: string;
   min?: number;
+  price?: number;
   onChange: (value: string) => void;
   onInputClick: () => void;
+  onClickMax: () => void;
+  onBlur?: () => void;
 }
 
 export default function Input({
@@ -30,6 +33,9 @@ export default function Input({
   disableSelection,
   onInputClick,
   onChange,
+  showMax,
+  onClickMax,
+  price,
   ...rest
 }: InputProps) {
   const [isEditing, setIsEditing] = useState(false);

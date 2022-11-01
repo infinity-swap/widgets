@@ -1,5 +1,11 @@
 import { Principal } from "@dfinity/principal";
 
+export interface PairErrorResponse {
+  InsufficientLiquidityToSwap: null;
+  enericError: string;
+  ExpectedSwapAmountLow: [bigint, bigint];
+  InsufficientTransitTokens: null;
+}
 export interface PoolStatsType {
   id?: string;
   owner: Principal;

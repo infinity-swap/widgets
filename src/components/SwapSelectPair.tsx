@@ -9,7 +9,7 @@ import SearchInput from "./SearchInput";
 interface SwapSelectPairType {
   onChange: (token: Token) => void;
   onClose: () => void;
-  filter?: () => void;
+  filter?: (token: Token) => void;
   isOpen: boolean;
   title?: string;
 }
