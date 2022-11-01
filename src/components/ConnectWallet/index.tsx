@@ -282,7 +282,7 @@ export default function ConnectWallet() {
 
   const selectedWallet: walletType = WALLETS.find(
     (wallet) => wallet.id === currentWalletId
-  ) || { id: "", exposedName: "", name: "", Icon: "", installation: "" };
+  ) || { id: "", exposedName: "", name: "", installation: "" };
 
   return (
     <Modal isOpen={showModal} onClose={() => setShowModal(false)} zIndex={20}>
