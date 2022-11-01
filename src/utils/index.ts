@@ -97,6 +97,9 @@ export const toDecimal = (
   return Math.round(Number(amount) * 10 ** Number(decimal ?? 0));
 };
 
-export const toActual = (amount: string | number, decimal: string | number) => {
+export const toActual = (
+  amount: string | number | bigint,
+  decimal: string | number
+) => {
   return Number(amount) / 10 ** Number(decimal ?? 0);
 };
