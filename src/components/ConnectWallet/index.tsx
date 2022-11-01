@@ -23,6 +23,7 @@ import TermsAgreeField from "./TermsAgreeField";
 import { ConnectWalletContext } from "../../contexts/ConnectWallet";
 import { Principal } from "@dfinity/principal";
 import Loader from "../Loader";
+import { WALLET_GUIDE_URL } from "../../shared/constants";
 
 interface Step1Type {
   connectedTo: string | null;
@@ -60,7 +61,7 @@ const RenderStep1 = ({
         ))}
       </div>
       <a
-        href="https://www.blog.infinityswap.one/getting-started-with-infinityswap-wallet-a-step-by-step-guide/"
+        href={WALLET_GUIDE_URL}
         target="_blank"
         className="block text-center"
         rel="noreferrer"
