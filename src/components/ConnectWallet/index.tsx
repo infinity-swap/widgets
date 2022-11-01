@@ -37,7 +37,7 @@ interface Step2Type extends Step1Type {
 
 interface connectionDataToStoreTypes {
   principal: string | Principal;
-  accountID?: string | null;
+  accountID: string | null;
   wallet: walletType;
 }
 
@@ -167,7 +167,11 @@ export default function ConnectWallet() {
         }
         const connected = await walletInstance.isConnected();
         if (connected) {
-          setConnectionDataToStore({ principal: principal.toText(), wallet });
+          setConnectionDataToStore({
+            principal: principal.toText(),
+            wallet,
+            accountID: "",
+          });
           return false;
         }
       }
@@ -196,6 +200,7 @@ export default function ConnectWallet() {
             setConnectionDataToStore({
               principal: principalIdText,
               wallet,
+              accountID: "",
             });
           } else {
             // notify, rejected request
