@@ -140,7 +140,6 @@ export default function ConnectWallet() {
 
   const connectionPayload = {
     host: process.env.REACT_APP_IC_HOST,
-    //whitelist: [canisterIds.tokenFactory],
   };
 
   const setConnectionDataToStore = ({
