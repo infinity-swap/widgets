@@ -120,14 +120,6 @@ const RenderStep2 = ({
 };
 
 export default function ConnectWallet() {
-  const { forced, toggleConnectModal } = useContext(ConnectWalletContext);
-  const [showModal, setShowModal] = useState<boolean>(true);
-  const [loading, setLoading] = useState<boolean>(false);
-  const [currentWalletId, setCurrentWalletId] = useState<string | null>(null);
-  const [showWarning, setShowWarning] = useState(false);
-  const [step, setStep] = useState<number>(1);
-  const userWallet = useUserWalletState();
-  const { setWallet } = useUserWalletDispatch();
   const principalId = useStore(principalSelector);
   const connectedTo = useStore(connectedToSelector);
   const setPrincipal = useStore(setPrincipalSelector);
@@ -137,6 +129,14 @@ export default function ConnectWallet() {
   const setActiveConnection = useStore(setActiveConnectionSelector);
   const activeConnection = useStore(activeConnectionSelector);
   const [termAccepted, setTermAccepted] = useState(!!principalId);
+  const [showModal, setShowModal] = useState<boolean>(true);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [currentWalletId, setCurrentWalletId] = useState<string | null>(null);
+  const [showWarning, setShowWarning] = useState(false);
+  const [step, setStep] = useState<number>(1);
+  const { forced, toggleConnectModal } = useContext(ConnectWalletContext);
+  const userWallet = useUserWalletState();
+  const { setWallet } = useUserWalletDispatch();
 
   const connectionPayload = {
     host: process.env.REACT_APP_IC_HOST,
