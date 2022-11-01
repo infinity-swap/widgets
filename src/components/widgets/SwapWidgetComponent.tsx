@@ -2,18 +2,80 @@ import React, { useState, useContext } from "react";
 import { Controller, useForm } from "react-hook-form";
 import Header from "../Header";
 import Input from "../Input";
-import useStore, { principalSelector, slippageSelector } from "../../store";
+import useStore, {
+  connectedToSelector,
+  principalSelector,
+  slippageSelector,
+} from "../../store";
 import Modal from "../Modal";
 import Button from "../Button";
 import { ConnectWalletContext } from "../../contexts/ConnectWallet";
 import ConnectWallet from "../ConnectWallet";
 import Account from "../Account";
 import SwapSelectPair from "../SwapSelectPair";
-import AppWrapper from "../AppWrapper";
+import {
+  useInSwapParameters,
+  useOutSwapParameters,
+} from "../../hooks/useSwapParameters";
+import debounce from "lodash.debounce";
+import { ReactComponent as ArrowDownIcon } from "../../assets/svg/arrow-down.svg";
+import { formatNum, toActual, toDecimal } from "../../utils";
+import Loader from "../Loader";
+import { defaultDecimal, LEDGER_SYMBOLS } from "../../shared/constants";
+import useCanisterIds from "../../hooks/useCanisterIds";
+import ProgressTracker, { useProgressTracker } from "../ProgressTracker";
+import { useFindPool } from "../../hooks/usePools";
+import {
+  idlFactory as PairIDL,
+  _SERVICE as PairService,
+} from "../../ic/idl/pair/pair.did";
+import {
+  idlFactory as LedgerIDL,
+  _SERVICE as LedgerService,
+} from "../../ic/idl/ledger/ledger.did";
+import { Token } from "../../types";
 
 const WhichToken = {
   IN: 1,
   OUT: 2,
+};
+
+interface defaultValuesType {
+  inToken: Token;
+}
+
+const SwapSteps = [
+  {
+    title: "Interact with canisters",
+    action:
+      "Allow InfinitySwap to interact with canisters on your behalf,\n confirm or deny in the wallet popup.",
+    loading: true,
+    error: false,
+  },
+  {
+    title: "Transfer input tokens into transit",
+    action:
+      "Allow InfinitySwap to transfer specified amount of tokens into transit.",
+    loading: true,
+    error: false,
+  },
+  {
+    title: "Swap",
+    action: "Swapping input tokens for output tokens",
+    loading: true,
+    error: false,
+  },
+];
+
+const initProgressTracker = {
+  steps: SwapSteps,
+};
+
+const refundTransferStep = {
+  title: "Refund Transfer",
+  action: "Allow refunding of tokens left in transit after swap",
+  loading: true,
+  error: false,
 };
 
 export default function SwapWidgetComponent({
@@ -24,7 +86,9 @@ export default function SwapWidgetComponent({
   onClose: () => void;
 }) {
   const [selectPair, toggleSelectPair] = useState<boolean>(false);
-
+  const [pTracker, pTrackerDispatch] = useProgressTracker(initProgressTracker);
+  const canisterIds = useCanisterIds();
+  const [poolId, setPoolId] = useState(null);
   const { forced, toggleConnectModal, showModalType } =
     useContext(ConnectWalletContext);
   const storedSlippage = useStore(slippageSelector);
@@ -39,13 +103,27 @@ export default function SwapWidgetComponent({
   } = useForm({
     mode: "onChange",
     defaultValues: {
-      inToken: undefined,
-      outToken: undefined,
+      inToken: { id: "", fee: 0 },
+      outToken: { id: "", fee: 0 },
       changeToken: WhichToken.IN,
       slippage: storedSlippage,
       inAmount: 0,
       outAmount: 0,
     },
+  });
+  const { mutateAsync: outSwapParameterCall } = useOutSwapParameters();
+  const { mutateAsync: inSwapParameterCall } = useInSwapParameters();
+  const { inAmount, outAmount, slippage, inToken, outToken, changeToken } =
+    watch();
+  const [toggleSwitch, setToggleSwitch] = useState(false);
+  const [isFetchingPrice, setFetchingPrice] = useState(false);
+  const [emptyLiquidity, setEmptyLiquidity] = useState(false);
+  const connectedTo = useStore(connectedToSelector);
+
+  const selectedPool = useFindPool({
+    token0: inToken?.id,
+    token1: outToken?.id,
+    poolId,
   });
 
   const onDropDownClick = (val: number) => {
@@ -66,13 +144,494 @@ export default function SwapWidgetComponent({
     }
   };
 
+  const resetInputs = () => {
+    resetField("inAmount");
+    resetField("outAmount");
+  };
+
+  const switchTokenValues = () => {
+    let [currInAmount, currOutAmount, currInToken, currOutToken] = getValues([
+      "inAmount",
+      "outAmount",
+      "inToken",
+      "outToken",
+    ]);
+
+    if (toggleSwitch) {
+      let temp = currInAmount;
+      currInAmount = currOutAmount;
+      currOutAmount = temp;
+
+      let tempToken = currInToken;
+      currInToken = currOutToken;
+      currOutToken = tempToken;
+    }
+
+    return {
+      currInAmount,
+      currOutAmount,
+      currInToken,
+      currOutToken,
+    };
+  };
+
+  const outSwapParameters = debounce(async () => {
+    try {
+      const { currInAmount, currInToken, currOutToken } = switchTokenValues();
+
+      if (!(currInToken && currOutToken && currInAmount > 0)) return;
+
+      setFetchingPrice(true);
+
+      const inAmountToSwap = BigInt(
+        toDecimal(currInAmount, defaultDecimal) - Number(currInToken.fee)
+      );
+
+      const bestPool = await outSwapParameterCall({
+        inToken: currInToken.id,
+        outToken: currOutToken.id,
+        inAmount: inAmountToSwap,
+        utility: canisterIds.utility,
+      });
+
+      if (bestPool) {
+        const { amount_out, pool } = bestPool;
+        const outAmountDp = toActual(
+          amount_out,
+          currOutToken?.decimals ?? defaultDecimal
+        );
+        setValue(toggleSwitch ? "inAmount" : "outAmount", outAmountDp, {
+          shouldValidate: true,
+        });
+        setPoolId(pool.toText());
+        setEmptyLiquidity(false);
+      }
+    } catch (error) {
+      console.log("fw err", error);
+      if (error?.message?.includes("doesn't have any liquidity")) {
+        /*  notification.error({
+          description: "This pool has no liquidity",
+        }); */
+        console.log(error);
+        setEmptyLiquidity(true);
+      }
+    } finally {
+      setFetchingPrice(false);
+    }
+  }, 1000);
+
+  const inSwapParameters = debounce(async () => {
+    try {
+      const { currOutAmount, currInToken, currOutToken } = switchTokenValues();
+
+      if (!(currInToken && currOutToken && currOutAmount > 0)) return;
+
+      setFetchingPrice(true);
+
+      const outAmountToSwap = toDecimal(currOutAmount, currOutToken?.decimals);
+
+      const bestPool = await inSwapParameterCall({
+        inToken: currInToken.id,
+        outToken: currOutToken.id,
+        outAmount: outAmountToSwap,
+        utility: canisterIds.utility,
+      });
+
+      if (bestPool) {
+        const { amount_in, pool } = bestPool;
+        const inAmountDp = toActual(
+          amount_in,
+          currInToken.decimals ?? defaultDecimal
+        );
+        setValue(toggleSwitch ? "outAmount" : "inAmount", inAmountDp, {
+          shouldValidate: true,
+        });
+        setPoolId(pool.toText());
+        setEmptyLiquidity(false);
+      }
+    } catch (error) {
+      console.log("rv err", error);
+      if (error?.message?.includes("doesn't have any liquidity")) {
+        /* notification.error({
+          description: "This pool has no liquidity",
+        }); */
+        setEmptyLiquidity(true);
+        console.log(error);
+      }
+    } finally {
+      setFetchingPrice(false);
+    }
+  }, 1000);
+
+  const onSelectToken = async (token) => {
+    if (changeToken === WhichToken.IN) {
+      setValue("inToken", token);
+      inSwapParameters();
+    } else {
+      setValue("outToken", token);
+      outSwapParameters();
+    }
+  };
+
+  const onFilter = (token) => {
+    return token.id !== inToken?.id && token.id !== outToken?.id;
+  };
+
+  const swapInput = () => {
+    setToggleSwitch(!toggleSwitch);
+  };
+
+  const getTokensData = () => {
+    if (toggleSwitch) {
+      return {
+        inAmount: Number(outAmount),
+        outAmount: Number(inAmount),
+        inToken: outToken,
+        outToken: inToken,
+      };
+    }
+    return {
+      inAmount,
+      outAmount,
+      inToken,
+      outToken,
+    };
+  };
+
+  const swapViaInfinityWallet = async () => {
+    try {
+      if (inAmount <= 0 && outAmount <= 0) {
+        return;
+      }
+
+      // switched Token
+      const sToken = getTokensData();
+
+      const inAmountDp = sToken.inAmount;
+      const outAmountDp = sToken.outAmount;
+
+      let inAmountToSend = toDecimal(inAmountDp, sToken.inToken?.decimals ?? 0);
+      inAmountToSend = BigInt(inAmountToSend);
+
+      const slippagePct = slippage ? slippage / 100 : 1.0;
+      const actualAmountIn = inAmountToSend - BigInt(sToken.inToken.fee);
+      const swapOptions = [
+        {
+          swap_out_estimate: toDecimal(outAmountDp, sToken.outToken?.decimals),
+          slippage_pct: slippagePct,
+          amount_in: actualAmountIn,
+          token_in: toggleSwitch ? { Token1: null } : { Token0: null },
+        },
+      ];
+      const swapArguments = [swapOptions, true];
+
+      pTrackerDispatch({
+        type: "open",
+        payload: {
+          title: `Swapping ${inAmountDp} ${sToken.inToken.symbol} for ${outAmountDp} ${sToken.outToken.symbol}.`,
+        },
+      });
+
+      let activePool = selectedPool?.id;
+      // Add Approval chain
+      if (!activePool) {
+        // 1. A token must be sent to the Pair using the approve and transferFrom flow
+        const [pair] = await Ic.actor(
+          canisterIds.pairFactory,
+          PairFactoryIDL
+        ).get_pairs(
+          Principal.fromText(sToken.inToken.id),
+          Principal.fromText(sToken.outToken.id)
+        );
+
+        activePool = pair.toText();
+      }
+
+      if (activePool) {
+        // connect to wallet & whitelist the canisters specified
+        await window.ic.infinityWallet.requestConnect({
+          whitelist: [
+            canisterIds.pairFactory,
+            sToken.inToken.id,
+            sToken.outToken.id,
+            activePool,
+          ],
+        });
+
+        const pairActor = await window.ic.infinityWallet.createActor({
+          canisterId: activePool,
+          interfaceFactory: PairIDL,
+        });
+
+        // move on to 'transfer input tokens into transit' step
+        pTrackerDispatch({ type: "next" });
+
+        let inTokenTxs = [];
+        if (LEDGER_SYMBOLS.includes(sToken.inToken.symbol)) {
+          const accountIdentifier = await pairActor.get_ledger_account_id();
+          inTokenTxs = [
+            {
+              idl: LedgerIDL,
+              canisterId: sToken.inToken.id,
+              methodName: "send_dfx",
+              args: [
+                {
+                  to: accountIdentifier,
+                  fee: {
+                    e8s: sToken.inToken.fee,
+                  },
+                  memo: 0,
+                  from_subaccount: [],
+                  created_at_time: [],
+                  amount: {
+                    e8s: inAmountToSend,
+                  },
+                },
+              ],
+              onSuccess: async (res) => {
+                // console.log("1st token send_dfx onSuccess", res);
+              },
+              onFail: (res) => {
+                console.log("1st token send_dfx onFail", res);
+
+                pTrackerDispatch({
+                  type: "error",
+                  payload: {
+                    title: `Failed to transfer ${inAmountDp} ${sToken.inToken.symbol} into transit`,
+                  },
+                });
+              },
+            },
+            {
+              idl: PairIDL,
+              canisterId: activePool,
+              methodName: "receive_icp",
+              args: [false],
+              onSuccess: async (res) => {
+                pTrackerDispatch({ type: "next" });
+              },
+              onFail: (res) => {
+                console.log("1st token receive_icp onFail", res);
+                pTrackerDispatch({
+                  type: "error",
+                  payload: {
+                    title: `Failed to transfer ${inAmountDp} ${sToken.inToken.symbol} into transit`,
+                  },
+                });
+              },
+            },
+          ];
+        } else {
+          const owner = Principal.fromText(activePool);
+          inTokenTxs = [
+            {
+              idl: TokenIDL,
+              canisterId: sToken.inToken.id,
+              methodName: "icrc1_transfer",
+              args: [
+                {
+                  to: {
+                    owner: Principal.fromText(activePool),
+                    subaccount: [SubAccount.fromPrincipal(principal).toArray()],
+                  },
+                  fee: [],
+                  memo: [],
+                  from_subaccount: [],
+                  created_at_time: [],
+                  amount: inAmountToSend,
+                },
+              ],
+              onSuccess: async (res) => {
+                // console.log("1st token icrc1_transfer onSuccess", res);
+              },
+              onFail: (res) => {
+                console.log("1st token icrc1_transfer onFail", res);
+                pTrackerDispatch({
+                  type: "error",
+                  payload: {
+                    title: `Failed to transfer ${inAmountDp} ${sToken.inToken.symbol} into transit`,
+                  },
+                });
+              },
+            },
+            {
+              idl: PairIDL,
+              canisterId: activePool,
+              methodName: "receive_icrc1",
+              args: [Principal.fromText(sToken.inToken.id), inAmountToSend],
+              onSuccess: async (res) => {
+                // console.log("1st token receive_icrc1 onSuccess", res);
+
+                // move on the swap step
+
+                pTrackerDispatch({ type: "next" });
+              },
+              onFail: (res) => {
+                console.log("1st token transfer_from onFail", res);
+
+                pTrackerDispatch({
+                  type: "error",
+                  payload: {
+                    title: `Failed to transfer ${inAmountDp} ${sToken.inToken.symbol} into transit`,
+                  },
+                });
+              },
+            },
+          ];
+        }
+
+        let refund = false;
+        await window.ic.infinityWallet.batchTransactions([
+          ...inTokenTxs,
+          {
+            idl: PairIDL,
+            canisterId: activePool,
+            methodName: "swap",
+            args: swapArguments,
+            onSuccess: (res) => {
+              const { Ok, Err } = res;
+
+              if (Ok) {
+                const {
+                  transit_reserves: tReserves,
+                  swap_out_amounts: outAmounts,
+                  swap_in_amounts: inAmounts,
+                } = Ok;
+
+                let [swapInAmount] = inAmounts.filter((val) => !!val);
+                let [swapOutAmount] = outAmounts.filter((val) => !!val);
+
+                refund = !!tReserves.reduce((a, b) => a + b, 0n);
+
+                swapInAmount = toActual(swapInAmount, sToken.inToken?.decimals);
+                swapOutAmount = toActual(
+                  swapOutAmount,
+                  sToken.outToken?.decimals
+                );
+
+                const title = `Swapped ${swapInAmount} ${sToken.inToken.symbol} for ${swapOutAmount} ${sToken.outToken.symbol}`;
+                pTrackerDispatch({
+                  type: "next",
+                  payload: {
+                    title,
+                  },
+                });
+                pTrackerDispatch({
+                  type: "close",
+                });
+                resetInputs();
+                onRequestClose();
+                /*  notification.success({
+                  description: `Swapped ${inAmountDp} ${sToken.inToken.symbol} for ${outAmountDp} ${sToken.outToken.symbol}`,
+                }); */
+                console.log("success");
+              }
+              if (Err) {
+                const errorMessage = parsePairError(Err);
+                pTrackerDispatch({
+                  type: "error",
+                  payload: {
+                    ...(errorMessage && { action: `${errorMessage}` }),
+                  },
+                });
+              }
+            },
+            onFail: async (res) => {
+              console.log("swap onFail", res);
+              pTrackerDispatch({
+                type: "error",
+                payload: {
+                  title: "Failed to swap token, please try again",
+                },
+              });
+            },
+          },
+        ]);
+
+        if (refund) {
+          try {
+            pTrackerDispatch({
+              type: "add_step",
+              payload: { newStep: refundTransferStep },
+            });
+
+            await pairActor.refund_transfer();
+
+            pTrackerDispatch({ type: "next" });
+            pTrackerDispatch({ type: "close" });
+
+            const refundMessage = "Refunded tokens in transit to your wallet";
+
+            /* notification.success({
+              message: refundMessage,
+            }); */
+            console.log("refundMessage", refundMessage);
+
+            pTrackerDispatch({ type: "close" });
+
+            resetInputs();
+          } catch (_) {
+            pTrackerDispatch({
+              type: "error",
+              title: "Failed to refund tokens left in transit",
+            });
+          }
+        }
+      }
+    } catch (error) {
+      console.log("error", error);
+      // canisterErrorHandler(error);
+      /* pTrackerDispatch({
+        type: "error",
+        title: "Failed to swap token, please try again",
+      }); */
+    }
+  };
+
+  const enoughTokenBalance = (value, type) => {
+    const token = type === WhichToken.IN ? inToken : outToken;
+    const balance = token?.balance ?? 0;
+
+    const amount = toDecimal(value, token.decimals || defaultDecimal);
+    if (amount < balance) {
+      return true;
+    }
+
+    return `Insufficient ${token?.symbol ?? ""} balance`;
+  };
+
+  const onSwap = async () => {
+    // Swap pair
+    if (!isValid) return;
+
+    if (connectedTo === "infinityWallet") {
+      await swapViaInfinityWallet();
+    }
+  };
+
+  const getButtonText = () => {
+    let text = "Confirm Order";
+
+    const message = Object.values(errors)?.[0]?.message;
+    if (message) {
+      text = message;
+    }
+
+    return text;
+  };
+
+  const onRequestClose = () => {
+    pTrackerDispatch({ type: "reset", payload: initProgressTracker });
+  };
+
   return (
     <>
       <ConnectWallet />
       <Account />
       <SwapSelectPair
         isOpen={selectPair}
-        onChange={() => {}}
+        filter={onFilter}
+        onChange={onSelectToken}
         onClose={() => toggleSelectPair((prev) => !prev)}
       />
       <Modal isOpen={isOpen} onClose={() => onClose()}>
@@ -87,35 +646,151 @@ export default function SwapWidgetComponent({
           </div>
           <div>
             <div className="mt-6 relative">
-              <Input
-                name="icp"
-                testId="swap-input-from"
-                onInputClick={() => onDropDownClick(WhichToken.IN)}
-                onChange={() => {}}
-                value={1}
+              <Controller
+                name="inAmount"
+                control={control}
+                rules={{
+                  validate: {
+                    morethanZero: (value) => value > 0 || "Invalid Amount",
+                    enoughBalance: (value) =>
+                      enoughTokenBalance(value, WhichToken.IN),
+                  },
+                }}
+                render={({ field }) => (
+                  <Input
+                    // disableSelection
+                    className={`swap-input ${toggleSwitch ? "switch1 " : ""}`}
+                    testId="swap-input-from"
+                    onChange={(value) => {
+                      field.onChange(value);
+                      if (toggleSwitch) {
+                        inSwapParameters();
+                      } else {
+                        outSwapParameters();
+                      }
+                    }}
+                    showMax={!toggleSwitch}
+                    onClickMax={() => onClickMax(inToken)}
+                    price={
+                      inAmount
+                        ? formatNum({
+                            value: (inToken?.price ?? 0) * inAmount,
+                            decimals: 2,
+                            fallback: "--",
+                          })
+                        : null
+                    }
+                    logo={inToken?.logo}
+                    name={inToken?.symbol ?? "Select"}
+                    value={field.value}
+                    min="0"
+                    onInputClick={() => onDropDownClick(WhichToken.IN)}
+                  />
+                )}
+              />
+              <div
+                data-testid="swp-arrow-container"
+                className="flex-center rounded-medium absolute bg-white dark:bg-dark-900 h-[32px] w-[32px] cursor-pointer z-1 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"
+                onClick={swapInput}
+              >
+                <div className="bg-primary-200 dark:bg-dark-200 rounded-small">
+                  <ArrowDownIcon
+                    alt="Arrow"
+                    className={`fill-primary-900 dark:fill-white arrow w-[24px] h-[24px] ${
+                      toggleSwitch ? "rotate-[-360deg]" : ""
+                    }`}
+                  />
+                </div>
+              </div>
+              <Controller
+                name="outAmount"
+                control={control}
+                rules={{
+                  validate: {
+                    enoughBalance: (value) =>
+                      enoughTokenBalance(value, WhichToken.IN),
+                    morethanZero: (value) => value > 0,
+                  },
+                }}
+                render={({ field }) => (
+                  <Input
+                    className={`swap-input ${
+                      toggleSwitch ? "switch2 " : "mt-2"
+                    }`}
+                    testId="swap-input-to"
+                    onChange={(value) => {
+                      field.onChange(value);
+                      if (toggleSwitch) {
+                        outSwapParameters();
+                      } else {
+                        inSwapParameters();
+                      }
+                    }}
+                    showMax={toggleSwitch}
+                    onClickMax={() => onClickMax(outToken)}
+                    price={
+                      outAmount
+                        ? formatNum({
+                            value: (outToken?.price ?? 0) * outAmount,
+                            decimals: 2,
+                            fallback: "--",
+                          })
+                        : formatNum({ value: outToken?.price, decimals: 4 })
+                    }
+                    logo={outToken?.logo}
+                    name={outToken?.symbol ?? "Select"}
+                    value={field.value}
+                    min="0"
+                    onInputClick={() => onDropDownClick(WhichToken.OUT)}
+                  />
+                )}
               />
             </div>
-            <div className="mt-6 relative">
-              <Input
-                name="aave"
-                testId="swap-input-from"
-                onInputClick={() => {}}
-                onChange={() => {}}
-                value={1}
-              />
+            <div className="mt-2">
+              {isFetchingPrice && (
+                <div className="flex items-center">
+                  <Loader height={25} width={25} />
+                  <span className="pl-2 capitalize">Fetching prices....</span>
+                </div>
+              )}
             </div>
-            <div className="mt-7">
+            <div className="mt-2">
               {!principalId ? (
                 <Button onClick={showWalletHandler} className="w-full">
                   Connect Wallet
                 </Button>
+              ) : isValid && !isFetchingPrice && !emptyLiquidity ? (
+                <Button
+                  disabled={!isValid}
+                  applyDisabledStyle={!isValid}
+                  size="full"
+                  className="mt-7 p-4 "
+                  data-testid="swap-btn"
+                  onClick={onSwap}
+                >
+                  {getButtonText()}
+                </Button>
               ) : (
-                <Button className="w-full">Swap</Button>
+                <Button
+                  applyDisabledStyle
+                  size="full"
+                  data-testid="swap-swtconfirm-button"
+                  className="mt-7 dark:bg-primary-300 p-4 bg-secondary-200 text-primary-900 h6-semibold dark:border-none"
+                >
+                  {getButtonText()}
+                </Button>
               )}
             </div>
           </div>
         </div>
       </Modal>
+      <ProgressTracker
+        isOpen={pTracker.open}
+        onRequestClose={onRequestClose}
+        steps={pTracker.steps}
+        activeStep={pTracker.activeStep}
+        message={pTracker.title}
+      />
     </>
   );
 }

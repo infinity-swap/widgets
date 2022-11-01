@@ -28,7 +28,7 @@ interface fetchPoolsProps {
 interface useFindPoolPayload {
   token0: string;
   token1: string;
-  poolId: string;
+  poolId: string | null;
   fetchWithTokens?: boolean;
 }
 
