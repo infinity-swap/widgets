@@ -1,4 +1,4 @@
-import { useReducer } from "react";
+import { useReducer, Reducer } from "react";
 import Loader from "./Loader";
 import Modal from "./Modal";
 import { ReactComponent as ErrorIcon } from "../assets/svg/error.svg";
@@ -6,13 +6,14 @@ import SuccessTick from "../assets/images/success-tick.png";
 import PgtCover from "../assets/images/pgt-cover.png";
 
 interface stepType {
-  title: string;
-  action: string;
-  loading: boolean;
-  error: boolean;
+  title?: string;
+  action?: string;
+  loading?: boolean;
+  error?: boolean;
 }
 interface stepPayloadType extends stepType {
   newStep?: stepType;
+  steps?: stepType[];
 }
 interface initialStateType {
   open?: boolean;
@@ -39,20 +40,22 @@ export const initialState = {
 
 function init(
   initialData: stepPayloadType = {
-    title: "",
-    action: "",
-    loading: false,
-    error: false,
+    steps: [],
   }
 ) {
   return { ...initialState, ...initialData };
 }
 
-function reducer(
-  state: initialStateType,
-  action: { type: string; payload?: stepType }
-) {
-  const payload = action.payload ?? {};
+interface ProgressAction {
+  type: string;
+  payload?: stepPayloadType;
+}
+
+const reducer: Reducer<initialStateType, ProgressAction> = (
+  state,
+  action
+): any => {
+  const payload = action.payload;
   let activeStep: number = 0;
   let steps = [];
   switch (action.type) {
@@ -70,8 +73,8 @@ function reducer(
       });
       return { ...state, steps, activeStep: activeStep + 1, ...payload };
     case "add_step": {
-      const { newStep, ...rest } = payload;
-      return { ...state, steps: [...state?.steps, newStep], ...rest };
+      const { ...rest } = payload;
+      return { ...state, steps: [...state?.steps, payload?.newStep], ...rest };
     }
     case "error":
       activeStep = state.activeStep!;
@@ -85,11 +88,11 @@ function reducer(
     case "reset":
       return init(payload);
     default:
-      throw new Error("unexpected type");
+      return state;
   }
-}
+};
 
-export function useProgressTracker(initialData: any) {
+export function useProgressTracker(initialData: initialStateType) {
   return useReducer(reducer, initialData, init);
 }
 

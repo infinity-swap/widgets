@@ -838,11 +838,11 @@ export default function SwapWidgetComponent({
         </div>
       </Modal>
       <ProgressTracker
-        isOpen={pTracker.open}
+        isOpen={pTracker.open!}
         onClose={onRequestClose}
         steps={pTracker.steps}
-        activeStep={pTracker.activeStep}
-        message={pTracker.title}
+        activeStep={pTracker.activeStep!}
+        message={pTracker.title!}
       />
     </>
   );
