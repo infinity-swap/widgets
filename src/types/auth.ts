@@ -5,10 +5,14 @@ export interface AuthSliceType {
   principal: string | null;
   accountId: string | null;
   connectedTo: string | null;
-  activeConnection: { [key: string]: string | boolean | null };
+  activeConnection: { [key: string]: string | boolean | null | Principal };
   setUnlocked: (value: boolean) => void;
   setConnectedTo: (value: string) => void;
   setPrincipal: (principal: string | null) => void;
   setAccountId: (accountId: string | null) => void;
-  setActiveConnection: (key: string, value: any, reset: boolean) => void;
+  setActiveConnection: (
+    key: string,
+    value: string | Principal | null,
+    reset: boolean
+  ) => void;
 }

@@ -23,6 +23,7 @@ import TermsAgreeField from "./TermsAgreeField";
 import { ConnectWalletContext } from "../../contexts/ConnectWallet";
 import { Principal } from "@dfinity/principal";
 import Loader from "../Loader";
+import { WALLET_GUIDE_URL } from "../../shared/constants";
 
 interface Step1Type {
   connectedTo: string | null;
@@ -60,7 +61,7 @@ const RenderStep1 = ({
         ))}
       </div>
       <a
-        href="https://www.blog.infinityswap.one/getting-started-with-infinityswap-wallet-a-step-by-step-guide/"
+        href={WALLET_GUIDE_URL}
         target="_blank"
         className="block text-center"
         rel="noreferrer"
@@ -119,14 +120,6 @@ const RenderStep2 = ({
 };
 
 export default function ConnectWallet() {
-  const { forced, toggleConnectModal, showModalType } =
-    useContext(ConnectWalletContext);
-  const [loading, setLoading] = useState<boolean>(false);
-  const [currentWalletId, setCurrentWalletId] = useState<string | null>(null);
-  const [showWarning, setShowWarning] = useState(false);
-  const [step, setStep] = useState<number>(1);
-  const userWallet = useUserWalletState();
-  const { setWallet } = useUserWalletDispatch();
   const principalId = useStore(principalSelector);
   const connectedTo = useStore(connectedToSelector);
   const setPrincipal = useStore(setPrincipalSelector);
@@ -136,10 +129,18 @@ export default function ConnectWallet() {
   const setActiveConnection = useStore(setActiveConnectionSelector);
   const activeConnection = useStore(activeConnectionSelector);
   const [termAccepted, setTermAccepted] = useState(!!principalId);
+  const [showModal, setShowModal] = useState<boolean>(true);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [currentWalletId, setCurrentWalletId] = useState<string | null>(null);
+  const [showWarning, setShowWarning] = useState(false);
+  const [step, setStep] = useState<number>(1);
+  const { forced, toggleConnectModal, showModalType } =
+    useContext(ConnectWalletContext);
+  const userWallet = useUserWalletState();
+  const { setWallet } = useUserWalletDispatch();
 
   const connectionPayload = {
     host: process.env.REACT_APP_IC_HOST,
-    //whitelist: [canisterIds.tokenFactory],
   };
 
   const setConnectionDataToStore = ({
@@ -167,7 +168,11 @@ export default function ConnectWallet() {
         }
         const connected = await walletInstance.isConnected();
         if (connected) {
-          setConnectionDataToStore({ principal: principal.toText(), wallet });
+          setConnectionDataToStore({
+            principal: principal.toText(),
+            wallet,
+            accountID: "",
+          });
           return false;
         }
       }
@@ -196,6 +201,7 @@ export default function ConnectWallet() {
             setConnectionDataToStore({
               principal: principalIdText,
               wallet,
+              accountID: "",
             });
           } else {
             // notify, rejected request
@@ -282,7 +288,7 @@ export default function ConnectWallet() {
 
   const selectedWallet: walletType = WALLETS.find(
     (wallet) => wallet.id === currentWalletId
-  ) || { id: "", exposedName: "", name: "", Icon: "", installation: "" };
+  ) || { id: "", exposedName: "", name: "", installation: "" };
 
   const onClose = () => {
     setStep(1);

@@ -1,10 +1,3 @@
-/*
-    SysFatal = 1,
-    SysTransient = 2,
-    DestinationInvalid = 3,
-    CanisterReject = 4,
-    CanisterError = 5
-*/
 const rejectedErrorCode = (code: number) => {
   switch (code) {
     case 1:

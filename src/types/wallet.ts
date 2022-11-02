@@ -1,3 +1,8 @@
+import React from "react";
+
+export interface IconType {
+  Icon: React.FunctionComponent<React.SVGProps<SVGSVGElement>>;
+}
 export interface walletType {
   id: string;
   exposedName: string;
