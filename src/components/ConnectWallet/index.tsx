@@ -38,7 +38,7 @@ interface Step2Type extends Step1Type {
 
 interface connectionDataToStoreTypes {
   principal: string | null;
-  accountID?: string | null;
+  accountID: string | null;
   wallet: walletType;
 }
 
