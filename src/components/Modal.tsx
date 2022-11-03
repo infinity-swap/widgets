@@ -1,5 +1,6 @@
 import React, { Fragment } from "react";
 import { Dialog, Transition } from "@headlessui/react";
+import { ReactComponent as CloseIcon } from "../assets/svg/close.svg";
 
 interface ModalProps {
   isOpen?: boolean;
@@ -7,13 +8,24 @@ interface ModalProps {
   onClose: () => void;
   children?: JSX.Element;
 }
+const Header = ({ title, onClose }: { title: string; onClose: () => void }) => {
+  return (
+    <div className={`w-full flex justify-between items-center`}>
+      <div className={"h6-semibold text-black"}>{title}</div>
+      <div>
+        <div className="hidden sm:block">
+          <CloseIcon
+            onClick={() => onClose()}
+            className="w-6 h-6 cursor-pointer"
+            stroke="var(--secondary-black)"
+          />
+        </div>
+      </div>
+    </div>
+  );
+};
 
-export default function Modal({
-  isOpen = false,
-  onClose,
-  children,
-  zIndex = 10,
-}: ModalProps) {
+function Modal({ isOpen = false, onClose, children, zIndex = 10 }: ModalProps) {
   return (
     <Transition.Root show={isOpen} as={Fragment}>
       <Dialog
@@ -56,3 +68,6 @@ export default function Modal({
     </Transition.Root>
   );
 }
+Modal.Header = Header;
+
+export default Modal;

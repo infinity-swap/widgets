@@ -37,7 +37,7 @@ interface Step2Type extends Step1Type {
 }
 
 interface connectionDataToStoreTypes {
-  principal: string | Principal;
+  principal: string | null;
   accountID: string | null;
   wallet: walletType;
 }
@@ -134,7 +134,8 @@ export default function ConnectWallet() {
   const [currentWalletId, setCurrentWalletId] = useState<string | null>(null);
   const [showWarning, setShowWarning] = useState(false);
   const [step, setStep] = useState<number>(1);
-  const { forced, toggleConnectModal } = useContext(ConnectWalletContext);
+  const { forced, toggleConnectModal, showModalType } =
+    useContext(ConnectWalletContext);
   const userWallet = useUserWalletState();
   const { setWallet } = useUserWalletDispatch();
 
@@ -289,43 +290,43 @@ export default function ConnectWallet() {
     (wallet) => wallet.id === currentWalletId
   ) || { id: "", exposedName: "", name: "", installation: "" };
 
+  const onClose = () => {
+    setStep(1);
+    toggleConnectModal("");
+  };
   return (
-    <Modal isOpen={showModal} onClose={() => setShowModal(false)} zIndex={20}>
+    <Modal
+      isOpen={showModalType === "connectWallet"}
+      onClose={() => onClose()}
+      zIndex={20}
+    >
       <div className="w-full md:w-[324px] p-5">
-        <div className={`w-full flex justify-between items-center`}>
-          <div className={"h6-semibold text-black"}>Select Wallet</div>
-          <div>
-            <div
-              className="hidden sm:block"
-              onClick={() => setShowModal(false)}
-            >
-              <CloseIcon className="w-6 h-6" stroke="var(--secondary-black)" />
-            </div>
-          </div>
+        <Modal.Header title="Select Wallet" onClose={() => onClose()} />
+        <div>
+          <TermsAgreeField
+            step={step}
+            termAccepted={termAccepted}
+            setTermAccepted={setTermAccepted}
+            showWarning={showWarning}
+            setShowWarning={setShowWarning}
+          />
+          {step === 1 && (
+            <RenderStep1
+              connectedTo={connectedTo}
+              currentWalletId={currentWalletId}
+              onWalletConnect={onWalletConnect}
+            />
+          )}
+          {step === 2 && (
+            <RenderStep2
+              loading={loading}
+              connectedTo={connectedTo}
+              currentWalletId={currentWalletId}
+              onWalletConnect={onWalletConnect}
+              wallet={selectedWallet}
+            />
+          )}
         </div>
-        <TermsAgreeField
-          step={step}
-          termAccepted={termAccepted}
-          setTermAccepted={setTermAccepted}
-          showWarning={showWarning}
-          setShowWarning={setShowWarning}
-        />
-        {step === 1 && (
-          <RenderStep1
-            connectedTo={connectedTo}
-            currentWalletId={currentWalletId}
-            onWalletConnect={onWalletConnect}
-          />
-        )}
-        {step === 2 && (
-          <RenderStep2
-            loading={loading}
-            connectedTo={connectedTo}
-            currentWalletId={currentWalletId}
-            onWalletConnect={onWalletConnect}
-            wallet={selectedWallet}
-          />
-        )}
       </div>
     </Modal>
   );
