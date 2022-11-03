@@ -32,7 +32,6 @@ export default function SwapWidget() {
       <Account />
       <Modal isOpen={isOpen} onClose={() => setIsOpen(false)}>
         <div className="bg-white px-4 pt-5 pb-4 sm:p-4 sm:pb-4 w-full md:w-[360px]">
-          {/* Header */}
           <div>
             <Header
               showWalletHandler={showWalletHandler}
