@@ -4,6 +4,18 @@ import { PairErrorResponse, walletType } from "../types";
 import numbro from "numbro";
 import { defaultDecimal } from "../shared/constants";
 
+interface formatNumPayload {
+  value: string | number;
+  decimals?: string | number;
+  average?: boolean;
+  prefix?: string;
+  postfix?: string;
+  fallback?: string;
+  truncate?: boolean;
+  trimMantissa?: boolean;
+  options?: any;
+}
+
 export const WALLET_IDS = {
   PLUG: "plug",
   INFINITY_WALLET: "infinityWallet",
@@ -49,8 +61,7 @@ export const formatNum = ({
   truncate,
   trimMantissa,
   options = {},
-  mine,
-}: any) => {
+}: formatNumPayload) => {
   if (isInvalidNum(value)) {
     return isUndefined(fallback) ? "--" : fallback;
   }
@@ -86,10 +97,14 @@ export const formatNum = ({
 export const isUndefined = (value: number | string | undefined) =>
   typeof value === "undefined";
 
-const getFlooredFixed = (value: any, decimals: any) => {
-  return (Math.floor(value * 10 ** decimals) / 10 ** decimals).toFixed(
-    decimals
-  );
+const getFlooredFixed = (
+  value: number | string,
+  decimals: number | string = 0
+) => {
+  return (
+    Math.floor(Number(value) * 10 ** Number(decimals)) /
+    10 ** Number(decimals)!
+  ).toFixed(Number(decimals));
 };
 
 export const parsePairError = (error: PairErrorResponse) => {

@@ -46,7 +46,7 @@ export default function Account() {
       toggleConnectModal("");
       setWalletStep(1);
       if ((window as any)?.ic?.infinityWallet) {
-        (window as any).ic.infinityWallet.disconnect();
+        (window as any)?.ic?.infinityWallet?.disconnect();
       }
     } catch (err) {
       console.log("Failed to disconnect wallet:", err);

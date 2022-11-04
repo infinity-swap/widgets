@@ -16,7 +16,6 @@ interface WalletFieldType extends WalletFieldWrapperType {
   className?: string;
   currentWalletId: string | null;
   wallet: walletType;
-  [rest: string]: any;
   onClick: (wallet: walletType) => void;
 }
 

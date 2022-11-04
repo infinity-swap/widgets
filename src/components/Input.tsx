@@ -13,7 +13,7 @@ interface InputProps {
   showMax?: boolean;
   logo?: string;
   min?: number;
-  price?: number;
+  price?: number | string | null;
   onChange: (value: string) => void;
   onInputClick: () => void;
   onClickMax: () => void;

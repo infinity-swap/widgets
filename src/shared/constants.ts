@@ -25,3 +25,13 @@ export const LEDGER_SYMBOLS = [
   REAL_LEDGER_METADATA.symbol,
   TEST_LEDGER_METADATA.symbol,
 ];
+export const WALLET_GUIDE_URL =
+  "https://www.blog.infinityswap.one/getting-started-with-infinityswap-wallet-a-step-by-step-guide/";
+
+export const CoinIcons: { [key: string]: string } = {
+  aave: "https://raw.githubusercontent.com/infinity-swap/cryptocurrency-icons/master/16/aave.png",
+  bnb: "https://raw.githubusercontent.com/infinity-swap/cryptocurrency-icons/master/16/bnb.png",
+  icp: "https://raw.githubusercontent.com/infinity-swap/cryptocurrency-icons/master/16/internet-computer.png",
+  "t-icp":
+    "https://raw.githubusercontent.com/infinity-swap/cryptocurrency-icons/master/16/internet-computer.png",
+};

@@ -123,19 +123,6 @@ const RenderStep2 = ({
 };
 
 export default function ConnectWallet() {
-  const [showError, setShowError] = useState(false);
-  const {
-    forced,
-    toggleConnectModal,
-    showModalType,
-    walletStep,
-    setWalletStep,
-  } = useContext(ConnectWalletContext);
-  const [loading, setLoading] = useState<boolean>(false);
-  const [currentWalletId, setCurrentWalletId] = useState<string | null>(null);
-  const [showWarning, setShowWarning] = useState(false);
-  const userWallet = useUserWalletState();
-  const { setWallet } = useUserWalletDispatch();
   const principalId = useStore(principalSelector);
   const connectedTo = useStore(connectedToSelector);
   const setPrincipal = useStore(setPrincipalSelector);
@@ -144,7 +131,23 @@ export default function ConnectWallet() {
   const setConnectedTo = useStore(setConnectedToSelector);
   const setActiveConnection = useStore(setActiveConnectionSelector);
   const activeConnection = useStore(activeConnectionSelector);
+
+  const [loading, setLoading] = useState<boolean>(false);
+  const [currentWalletId, setCurrentWalletId] = useState<string | null>(null);
+  const [showWarning, setShowWarning] = useState(false);
+  const [showError, setShowError] = useState(false);
   const [termAccepted, setTermAccepted] = useState(!!principalId);
+  const {
+    forced,
+    toggleConnectModal,
+    showModalType,
+    walletStep,
+    setWalletStep,
+  } = useContext(ConnectWalletContext);
+
+  const userWallet = useUserWalletState();
+  const { setWallet } = useUserWalletDispatch();
+
   const canisterIds = useCanisterIds();
 
   const connectionPayload = {
@@ -215,6 +218,7 @@ export default function ConnectWallet() {
         } catch (error) {
           // notify, error message
           // notification.error({ description: error.message });
+          setShowError(true);
           setUnlocked(false);
         } finally {
           setLoading(false);
@@ -257,8 +261,9 @@ export default function ConnectWallet() {
             wallet,
           });
         } else {
-          // request rejected
-          console.log("rejected");
+          // pass user defined error handler request rejected
+          //console.log("rejected");
+          setShowError(true);
           setUnlocked(false);
         }
       } catch (error) {

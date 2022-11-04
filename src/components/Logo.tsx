@@ -1,5 +1,5 @@
 import React from "react";
-import { CoinIcons } from "../utils/coinIcons";
+import { CoinIcons } from "../shared/constants";
 interface LogoProps {
   logoURI?: string;
   symbol?: string;

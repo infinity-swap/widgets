@@ -51,7 +51,7 @@ import {
 import { PairErrorResponse, Token } from "../../types";
 import { Principal } from "@dfinity/principal";
 import Ic from "../../ic";
-import { SubAccount } from "../../ic/account";
+import { SubAccount } from "../../ic/account.js";
 
 const WhichToken = {
   IN: 1,
@@ -661,20 +661,20 @@ export default function SwapWidgetComponent({
 
   const onClickMax = (token: Token) => {
     const fee = Number(token?.fee || 0) + 0.1 * Number(token?.fee || 0);
-    let balance = Number(token?.balance) - fee;
-    balance = formatNum({
-      value: toActual(balance, token?.decimals || defaultDecimal),
+    let getbalance = Number(token?.balance) - fee;
+    const balance = formatNum({
+      value: toActual(getbalance!, token?.decimals || defaultDecimal),
       decimals: 2,
       truncate: true,
     });
 
     if (toggleSwitch) {
-      setValue("outAmount", balance, {
+      setValue("outAmount", Number(balance), {
         shouldValidate: true,
       });
     }
     if (!toggleSwitch) {
-      setValue("inAmount", balance, { shouldValidate: true });
+      setValue("inAmount", Number(balance), { shouldValidate: true });
     }
   };
 
@@ -788,7 +788,10 @@ export default function SwapWidgetComponent({
                             decimals: 2,
                             fallback: "--",
                           })
-                        : formatNum({ value: outToken?.price, decimals: 4 })
+                        : formatNum({
+                            value: outToken?.price ?? 0,
+                            decimals: 4,
+                          })
                     }
                     logo={outToken?.logo}
                     name={outToken?.symbol ?? "Select"}

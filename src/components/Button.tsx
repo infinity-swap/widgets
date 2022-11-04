@@ -14,7 +14,11 @@ interface VariantButtonType {
   applyDisabledStyle?: boolean;
   disabled?: boolean;
 }
-const buttonSizes: any = {
+interface buttonSizesType {
+  [key: string]: string;
+}
+
+const buttonSizes: buttonSizesType = {
   sm: "py-2 px-3",
   md: "p-4",
   lg: "py-4 px-5",
@@ -38,7 +42,10 @@ export default function Button({
   ...rest
 }: ButtonProps) {
   const sizeProp = size in buttonSizes ? size : "sm";
-  const classes = clsx(buttonSizes[sizeProp], className);
+  const classes = clsx(
+    buttonSizes[sizeProp as keyof buttonSizesType],
+    className
+  );
   switch (variant) {
     case "secondary":
       return (
