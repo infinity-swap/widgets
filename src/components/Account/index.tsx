@@ -66,25 +66,29 @@ export default function Account() {
             onClose={() => toggleConnectModal("")}
           />
           <div className="flex justify-between mt-2">
-            <span className="body-secondary-semibold text-secondary-800">
+            <span className="body-secondary-semibold text-[var(--textGrey)]">
               Connected with {getWallet(connectedTo)}
             </span>
             <span
-              className="cursor-pointer text-primary-900 body-secondary font-bold uppercase ml-6"
+              className="cursor-pointer text-[var(--primary)] body-secondary font-bold uppercase ml-6"
               onClick={() => toggleConnectModal("connectWallet")}
             >
               Change
             </span>
           </div>
           <div>
-            <div className="mt-5 h6-semibold">Principal</div>
-            <div className="bg-secondary-200 flex items-center rounded-md h-[52px] mt-2">
+            <div className="mt-5 h6-semibold text-[var(--textDark)]">
+              Principal
+            </div>
+            <div className="bg-[var(--inputContainer)] flex items-center rounded-md h-[52px] mt-2">
               <div className="w-3/4 overflow-hidden px-4 ">
-                <div className=" whitespace-nowrap truncate">{principalId}</div>
+                <div className=" whitespace-nowrap  truncate">
+                  {principalId}
+                </div>
               </div>
             </div>
             <div
-              className="flex justify-end cursor-pointer text-primary-800 body-secondary font-bold uppercase mt-2"
+              className="flex justify-end cursor-pointer text-[var(--textDark)] body-secondary font-bold uppercase mt-2"
               onClick={() => disconnect()}
               data-testid="disconnect-wallet"
             >

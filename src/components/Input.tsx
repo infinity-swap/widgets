@@ -76,19 +76,19 @@ export default function Input({
   return (
     <div>
       <div
-        className={`flex flex-col justify-center bg-secondary-100 rounded-xl px-4 rounded-medium h-[72px] ${className}`}
+        className={`flex flex-col justify-center bg-[var(--inputContainer)] rounded-xl px-4 rounded-medium h-[72px] ${className}`}
       >
         <div className="flex justify-between items-center w-full">
           <div
             data-testid={`${testId}-dropdown-button`}
-            className="bg-table-bg bg-white dark:bg-dark-900 p-[8px] rounded-full border border-secondary-200"
+            className="bg-[var(--interactive)]  dark:bg-dark-900 p-[8px] rounded-[var(--interactiveBorderRadius)] border border-[var(--interactiveBorder)]"
           >
             <div className="flex items-center space-x-2">
               <span>
                 <Logo symbol={name} logoURI={logo} />
               </span>
               <span
-                className={`body-primary-semibold text-secondary whitespace-nowrap 
+                className={`body-primary-semibold text-[var(--textDark)] whitespace-nowrap 
               ${disableSelection && "pr-5"}`}
                 onClick={() => renderInputClick()}
               >
@@ -112,7 +112,7 @@ export default function Input({
                 placeholder="0.0"
                 value={isEditing ? value : formatNumber(value)}
                 data-testid={testId}
-                className={`h5-semibold bg-transparent relative w-full text-secondary-black text-right outline-none`}
+                className={`h5-semibold bg-transparent relative w-full text-[var(--textDark)] text-right outline-none placeholder-[var(--textGrey)] `}
                 type="number"
                 readOnly={readOnly}
                 onChange={(e) =>

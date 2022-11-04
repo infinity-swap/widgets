@@ -1,4 +1,4 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useEffect, useRef } from "react";
 import { Controller, useForm } from "react-hook-form";
 import Header from "../Header";
 import Input from "../Input";
@@ -48,10 +48,11 @@ import {
   idlFactory as LedgerIDL,
   _SERVICE as LedgerService,
 } from "../../ic/idl/ledger/ledger.did";
-import { PairErrorResponse, Token } from "../../types";
+import { PairErrorResponse, Token, WidgetProps } from "../../types";
 import { Principal } from "@dfinity/principal";
 import Ic from "../../ic";
 import { SubAccount } from "../../ic/account";
+import { ThemeContext } from "../../contexts/themeContext";
 
 const WhichToken = {
   IN: 1,
@@ -101,20 +102,16 @@ const refundTransferStep = {
   error: false,
 };
 
-export default function SwapWidgetComponent({
-  isOpen,
-  onClose,
-}: {
-  isOpen: boolean;
-  onClose: () => void;
-}) {
+export default function SwapWidgetComponent({ theme }: WidgetProps) {
   const [selectPair, toggleSelectPair] = useState<boolean>(false);
   const [pTracker, pTrackerDispatch] = useProgressTracker(initProgressTracker);
   const canisterIds = useCanisterIds();
   const [poolId, setPoolId] = useState<string | null>(null);
   const { toggleConnectModal } = useContext(ConnectWalletContext);
+  const { setCSSVariables } = useContext(ThemeContext);
   const storedSlippage = useStore(slippageSelector);
   const principalId = useStore(principalSelector);
+  const [showTest, setShowTest] = useState(false);
   const {
     resetField,
     control,
@@ -141,6 +138,8 @@ export default function SwapWidgetComponent({
   const [isFetchingPrice, setFetchingPrice] = useState(false);
   const [emptyLiquidity, setEmptyLiquidity] = useState(false);
   const connectedTo = useStore(connectedToSelector);
+  const isMountedRef = useRef(true);
+  setCSSVariables(theme);
 
   const selectedPool = useFindPool({
     token0: inToken?.id,
@@ -679,7 +678,7 @@ export default function SwapWidgetComponent({
   };
 
   return (
-    <>
+    <div className="swap-widget light">
       <ConnectWallet />
       <Account />
       <SwapSelectPair
@@ -688,8 +687,9 @@ export default function SwapWidgetComponent({
         onChange={onSelectToken}
         onClose={() => toggleSelectPair((prev) => !prev)}
       />
-      <Modal isOpen={isOpen} onClose={() => onClose()}>
-        <div className="bg-white px-4 pt-5 pb-4 sm:p-4 sm:pb-4 w-full md:w-[360px]">
+
+      <div className="">
+        <div className="bg-[var(--container)] px-4 pt-5 pb-4 sm:p-4 sm:pb-4 w-full md:w-[360px]">
           {/* Header */}
           <div>
             <Header
@@ -803,7 +803,7 @@ export default function SwapWidgetComponent({
               {isFetchingPrice && (
                 <div className="flex items-center">
                   <Loader height={25} width={25} />
-                  <span className="pl-2 capitalize">Fetching prices....</span>
+                  <span className="pl-2 capitalize ">Fetching prices....</span>
                 </div>
               )}
             </div>
@@ -828,7 +828,7 @@ export default function SwapWidgetComponent({
                   applyDisabledStyle
                   size="full"
                   data-testid="swap-swtconfirm-button"
-                  className="mt-7 dark:bg-primary-300 p-4 bg-secondary-200 text-primary-900 h6-semibold dark:border-none"
+                  className="mt-7 dark:bg-primary-300 p-4 text-primary-900 h6-semibold dark:border-none"
                 >
                   {getButtonText()}
                 </Button>
@@ -836,7 +836,8 @@ export default function SwapWidgetComponent({
             </div>
           </div>
         </div>
-      </Modal>
+      </div>
+
       <ProgressTracker
         isOpen={pTracker.open!}
         onClose={onRequestClose}
@@ -844,6 +845,6 @@ export default function SwapWidgetComponent({
         activeStep={pTracker.activeStep!}
         message={pTracker.title!}
       />
-    </>
+    </div>
   );
 }

@@ -72,11 +72,10 @@ const PrimaryButton = ({
   ...rest
 }: VariantButtonType) => {
   const defaultStyle =
-    "bg-primary-gradient  text-white rounded-xl dark:bg-primary-800 dark:bg-none";
-  const hoverStyle =
-    "hover:bg-primary-800 hover:bg-none dark:hover:bg-primary-hover";
+    "bg-[var(--primary)]  text-white rounded-xl dark:bg-primary-800 dark:bg-none";
+  const hoverStyle = "hover:bg-[var(--primary)] dark:hover:bg-primary-hover";
   const disabledStyle =
-    "bg-grey-200 dark:bg-secondary-grey-10 border-none text-secondary-800 bg-none dark:border-2 dark:border-grey-100 rounded-xl";
+    "bg-[var(--disabled)] dark:bg-secondary-grey-10 border-none text-secondary-800 dark:border-2 dark:border-grey-100 rounded-xl";
 
   const classes = clsx(
     applyDisabledStyle ? disabledStyle : defaultStyle,
@@ -85,7 +84,13 @@ const PrimaryButton = ({
   );
 
   return (
-    <button type="button" className={classes} disabled={disabled} {...rest}>
+    <button
+      type="button"
+      className={classes}
+      disabled={disabled}
+      {...rest}
+      // style={{ background: "var(--primary)" }}
+    >
       {children}
     </button>
   );

@@ -50,7 +50,7 @@ const TermsAgreeField = ({
             </span>
           )}
           <label htmlFor="terms" className="flex items-center">
-            <span className="body-secondary-semibold">
+            <span className="body-secondary-semibold text-[var(--textDark)]">
               <span>
                 By connecting a wallet, you agree to Infinity swap{" "}
                 <a
@@ -67,7 +67,7 @@ const TermsAgreeField = ({
         </div>
       </div>
       {showWarning && (
-        <span className="text-red-500 text-sm">
+        <span className="text-[var(--error)] text-sm">
           Please accept terms and conditions first
         </span>
       )}

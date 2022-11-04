@@ -94,7 +94,7 @@ const RenderStep2 = ({
       )}
       {error && (
         <div className="w-full box-border flex items-center my-4 p-2 rounded-[8px] bg-secondary-100 border border-red-500">
-          <span className="body-secondary mr-4 text-red-500">
+          <span className="body-secondary mr-4 text-[var(--error)]">
             Error connecting
           </span>
           <span

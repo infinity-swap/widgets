@@ -2,6 +2,7 @@ import React from "react";
 import useTokens, { useTokensWithUserBalance } from "../hooks/useTokens";
 import useStore, { accountSelector, principalSelector } from "../store";
 import { Token } from "../types";
+import Button from "./Button";
 import Logo from "./Logo";
 import Modal from "./Modal";
 import SearchInput from "./SearchInput";
@@ -33,6 +34,7 @@ export default function SwapSelectPair({
     onChange(token);
     onClose();
   };
+
   return (
     <Modal isOpen={isOpen} onClose={() => onClose()} zIndex={20}>
       <div className="h-full">
@@ -46,7 +48,7 @@ export default function SwapSelectPair({
             </div>
           </div>
         </div>
-        <div className="hidden sm:block border border-solid border-secondary-200 mt-4 mb-1" />
+        <div className="hidden sm:block border border-solid border-[var(--interactiveBorder)] mt-4 mb-1" />
         <div className="w-full flex flex-col max-h-[250px]  sm:max-h-[188px] overflow-y-scroll items-center px-[12px] pt-0 sm:pt-[16px]">
           {tokens.map((token, index) => {
             return (
@@ -66,10 +68,10 @@ export default function SwapSelectPair({
                     </div>
 
                     <div className="flex flex-col space-y-[4px]">
-                      <span className="h6-semibold text-secondary-black">
+                      <span className="h6-semibold text-[var(--textDark)]">
                         {token.symbol}
                       </span>
-                      <span className="body-secondary-semibold text-secondary-800">
+                      <span className="body-secondary-semibold text-[var(--textGrey)]">
                         {token.name}
                       </span>
                     </div>

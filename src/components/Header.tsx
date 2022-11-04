@@ -21,11 +21,11 @@ export default function Header({
   return (
     <div className="swap-modal-header">
       <div className="flex justify-between items-center">
-        <div>{label || "Swap"}</div>
+        <div className="text-[var(--textDark)]">{label || "Swap"}</div>
         <div className="flex items-center space-x-2">
           <div
             onClick={() => showWalletHandler()}
-            className="body-secondary bg-secondary-100 py-1 px-2 rounded-md dark:text-white-600 cursor-pointer"
+            className="body-secondary bg-secondary-100 py-1 px-2 rounded-md text-[var(--textDark)] cursor-pointer"
           >
             {principalId ? (
               <div className="w-24 flex items-center space-x-1 truncate">
