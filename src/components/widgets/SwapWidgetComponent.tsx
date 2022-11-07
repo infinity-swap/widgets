@@ -744,10 +744,10 @@ export default function SwapWidgetComponent({ theme }: WidgetProps) {
               />
               <div
                 data-testid="swp-arrow-container"
-                className="flex-center rounded-medium absolute bg-white dark:bg-dark-900 h-[32px] w-[32px] cursor-pointer z-1 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"
+                className="flex justify-center items-center rounded-md absolute bg-white dark:bg-dark-900 h-[32px] w-[32px] cursor-pointer z-1 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"
                 onClick={swapInput}
               >
-                <div className="bg-primary-200 dark:bg-dark-200 rounded-small">
+                <div className="bg-primary-200 dark:bg-dark-200 rounded-md">
                   <ArrowDownIcon
                     className={`fill-primary-900 dark:fill-white arrow w-[24px] h-[24px] ${
                       toggleSwitch ? "rotate-[-360deg]" : ""
