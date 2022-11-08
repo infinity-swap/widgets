@@ -2,7 +2,7 @@ import React from "react";
 import { useReducer, Reducer } from "react";
 import Loader from "./Loader";
 import Modal from "./Modal";
-import ErrorIcon from "../assets/svg/error.svg";
+import { ErrorIcon } from "../assets/svg/Icons";
 import SuccessTick from "../assets/images/success-tick.png";
 import PgtCover from "../assets/images/pgt-cover.png";
 
