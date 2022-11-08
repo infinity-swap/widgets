@@ -1,5 +1,5 @@
 import React from "react";
-// import CloseIcon from "../assets/svg/close.svg";
+import { CloseIcon } from "../assets/svg/Icons";
 
 interface ModalProps {
   isOpen?: boolean;
@@ -13,11 +13,11 @@ const Header = ({ title, onClose }: { title: string; onClose: () => void }) => {
       <div className={"h6-semibold text-[var(--textDark)]"}>{title}</div>
       <div>
         <div className="hidden sm:block">
-          {/*  <CloseIcon
+          <CloseIcon
             onClick={() => onClose()}
             className="w-6 h-6 cursor-pointer"
-            stroke="var(--secondary-black)"
-          /> */}
+            // stroke="var(--secondary-black)"
+          />
         </div>
       </div>
     </div>

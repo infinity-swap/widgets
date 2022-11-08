@@ -1,6 +1,6 @@
 import clsx from "clsx";
 import React, { ReactNode } from "react";
-import RectangleIcon from "../assets/svg/primary-online-rectangle.svg";
+import { RectangleIcon } from "../assets/svg/Icons";
 import { walletType } from "../types";
 import Loader from "./Loader";
 

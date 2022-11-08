@@ -2,7 +2,7 @@ import React from "react";
 import { useReducer, Reducer } from "react";
 import Loader from "./Loader";
 import Modal from "./Modal";
-import ErrorIcon from "../assets/svg/error.svg";
+import { ErrorIcon } from "../assets/svg/Icons";
 import SuccessTick from "../assets/images/success-tick.png";
 import PgtCover from "../assets/images/pgt-cover.png";
 
@@ -104,7 +104,6 @@ export default function ProgressTracker({
   steps = [],
   activeStep = 0,
 }: ProgressTrackerProps) {
-  console.log("was loaded");
   return (
     <Modal isOpen={isOpen} onClose={() => onClose()} zIndex={20}>
       <div className="bg-white dark:bg-dark-900 rounded-2xl w-full md:w-[360px]">
