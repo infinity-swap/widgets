@@ -1,0 +1,50 @@
+{
+  "name": "swapwidget",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "ladle": "ladle serve"
+  },
+  "eslintConfig": {
+    "env": {
+      "browser": true,
+      "node": true
+    }
+  },
+  "author": "leleking",
+  "license": "ISC",
+  "dependencies": {
+    "@dfinity/agent": "^0.11.1",
+    "@dfinity/auth-client": "^0.11.1",
+    "@dfinity/authentication": "^0.11.1",
+    "@dfinity/candid": "^0.11.1",
+    "@dfinity/identity": "^0.11.1",
+    "@dfinity/principal": "^0.11.1",
+    "axios": "^1.1.3",
+    "buffer": "^6.0.3",
+    "clsx": "^1.2.1",
+    "crc": "^4.1.0",
+    "js-sha256": "^0.9.0",
+    "lodash.debounce": "^4.0.8",
+    "numbro": "^2.3.6",
+    "react-hook-form": "^7.38.0",
+    "react-query": "^3.39.2",
+    "react-scripts": "5.0.1",
+    "react-use": "^17.4.0",
+    "zustand": "^4.0.0-rc.1"
+  },
+  "devDependencies": {
+    "@ladle/react": "^2.4.5",
+    "@types/react": "^18.0.25",
+    "@types/react-dom": "^18.0.8",
+    "autoprefixer": "^10.4.13",
+    "file-loader": "^6.2.0",
+    "postcss": "^8.4.18",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "tailwindcss": "^3.2.2",
+    "typescript": "^4.8.4"
+  }
+}
