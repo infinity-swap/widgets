@@ -21,7 +21,14 @@ import debounce from "lodash.debounce";
 import { ArrowDownIcon } from "../../assets/svg/Icons";
 import { formatNum, parsePairError, toActual, toDecimal } from "../../utils";
 import Loader from "../Loader";
-import { defaultDecimal, LEDGER_SYMBOLS } from "../../shared/constants";
+import {
+  CANISTER_IDS_URL,
+  defaultDecimal,
+  IC_ENVIRON,
+  IC_HOST,
+  LEDGER_SYMBOLS,
+  MAINNET_LEDGER_CANISTER_ID,
+} from "../../shared/constants";
 import useCanisterIds from "../../hooks/useCanisterIds";
 import ProgressTracker, { useProgressTracker } from "../ProgressTracker";
 import { useFindPool } from "../../hooks/usePools";
@@ -48,7 +55,7 @@ import {
   idlFactory as LedgerIDL,
   _SERVICE as LedgerService,
 } from "../../ic/idl/ledger/ledger.did";
-import { PairErrorResponse, Token, WidgetProps } from "../../types";
+import { PairErrorResponse, SwapProps, Token, WidgetProps } from "../../types";
 import { Principal } from "@dfinity/principal";
 import Ic from "../../ic";
 import { SubAccount } from "../../ic/account";
@@ -102,12 +109,17 @@ const refundTransferStep = {
   error: false,
 };
 
-export default function SwapWidgetComponent({ theme }: WidgetProps) {
+export default function SwapWidgetComponent({
+  theme,
+  onConnectWallet = null,
+  icNetwork,
+}: WidgetProps & SwapProps) {
   const [selectPair, toggleSelectPair] = useState<boolean>(false);
   const [pTracker, pTrackerDispatch] = useProgressTracker(initProgressTracker);
   const canisterIds = useCanisterIds();
   const [poolId, setPoolId] = useState<string | null>(null);
-  const { toggleConnectModal } = useContext(ConnectWalletContext);
+  const { toggleConnectModal, setWidgetOptions, setIcNetwork } =
+    useContext(ConnectWalletContext);
   const { setCSSVariables } = useContext(ThemeContext);
   const storedSlippage = useStore(slippageSelector);
   const principalId = useStore(principalSelector);
@@ -139,7 +151,19 @@ export default function SwapWidgetComponent({ theme }: WidgetProps) {
   const [emptyLiquidity, setEmptyLiquidity] = useState(false);
   const connectedTo = useStore(connectedToSelector);
   const isMountedRef = useRef(true);
-  setCSSVariables(theme);
+
+  useEffect(() => {
+    setIcNetwork({
+      icHost: icNetwork?.icHost || IC_HOST,
+      icEnviron: icNetwork?.icEnviron || IC_ENVIRON,
+      MAINNET_LEDGER_CANISTER_ID:
+        icNetwork?.MAINNET_LEDGER_CANISTER_ID || MAINNET_LEDGER_CANISTER_ID,
+      CANISTER_IDS_URL: icNetwork?.CANISTER_IDS_URL || CANISTER_IDS_URL,
+    });
+    setCSSVariables(theme);
+  }, [theme, icNetwork]);
+
+  //setWidgetOptions({ onConnecWallet: () => console.log("connect wallet") });
 
   const selectedPool = useFindPool({
     token0: inToken?.id,
@@ -157,11 +181,16 @@ export default function SwapWidgetComponent({ theme }: WidgetProps) {
   };
 
   const showWalletHandler = () => {
-    if (!principalId) {
-      toggleConnectModal("connectWallet");
+    if (onConnectWallet) {
+      onConnectWallet();
     }
-    if (principalId) {
-      toggleConnectModal("account");
+    if (!onConnectWallet) {
+      if (!principalId) {
+        toggleConnectModal("connectWallet");
+      }
+      if (principalId) {
+        toggleConnectModal("account");
+      }
     }
   };
 

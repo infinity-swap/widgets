@@ -5,7 +5,7 @@ import { InstallPromptProvider } from "./contexts/InstallPrompt";
 import { UserWalletProvider } from "./contexts/UserWallet";
 import { ThemeProvider } from "./contexts/themeContext";
 import { getRejectErrorCode } from "./utils/canisterErrorHandler";
-import { WidgetProps } from "./types";
+import { SwapProps, WidgetProps } from "./types";
 import SwapWidgetComponent from "./components/widgets/SwapWidgetComponent";
 import "./assets/style.css";
 
@@ -30,7 +30,7 @@ const queryClient = new QueryClient({
   },
 });
 
-export const SwapWidget = ({ theme }: WidgetProps) => {
+export const SwapWidget = (props: WidgetProps & SwapProps) => {
   return (
     <div className="App">
       <QueryClientProvider client={queryClient}>
@@ -38,7 +38,7 @@ export const SwapWidget = ({ theme }: WidgetProps) => {
           <ConnectWalletProvider>
             <InstallPromptProvider>
               <ThemeProvider>
-                <SwapWidgetComponent theme={theme} />
+                <SwapWidgetComponent {...props} />
               </ThemeProvider>
             </InstallPromptProvider>
           </ConnectWalletProvider>
