@@ -7,6 +7,7 @@ import {
 import { ConnectWalletContext } from "../contexts/ConnectWallet";
 import { useContext } from "react";
 import { icNetworkType } from "../types";
+import useStore, { icNetworkSelector } from "../store";
 
 type CanisterIds = { [key: string]: string };
 
@@ -48,7 +49,7 @@ export const fetchCanisterIds = async (icNetwork: icNetworkType) => {
 };
 
 function useCanisterIds() {
-  const { icNetwork } = useContext(ConnectWalletContext);
+  const icNetwork = useStore(icNetworkSelector);
   const { data } = useQuery(
     "canister_ids",
     async () => fetchCanisterIds(icNetwork),

@@ -18,6 +18,7 @@ import { Principal } from "@dfinity/principal";
 import { PoolStatsType } from "../types";
 import { useContext, useMemo } from "react";
 import { ConnectWalletContext } from "../contexts/ConnectWallet";
+import useStore, { icNetworkSelector } from "../store";
 
 interface fetchPoolsProps {
   pairFactory: string;
@@ -96,8 +97,7 @@ const fetchPools = async ({
 };
 
 export default function usePools() {
-  const { icNetwork } = useContext(ConnectWalletContext);
-
+  const icNetwork = useStore(icNetworkSelector);
   const { pairFactory, ledger, ledgerTest } = useCanisterIds();
   const { data } = useQuery(
     ["pools", pairFactory, ledger, ledgerTest],
@@ -105,7 +105,7 @@ export default function usePools() {
     {
       enabled: !!(
         pairFactory &&
-        (icNetwork.IC_ENVIRON === "testnet" ? ledger && ledgerTest : ledgerTest)
+        (icNetwork.icEnviron === "testnet" ? ledger && ledgerTest : ledgerTest)
       ),
     }
   );
