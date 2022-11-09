@@ -1,12 +1,7 @@
 import React, { useState } from "react";
-import useTokens, { useTokensWithUserBalance } from "../hooks/useTokens";
-import useStore, {
-  accountSelector,
-  inputTokenSymbolSelector,
-  principalSelector,
-} from "../store";
+import { useTokensWithUserBalance } from "../hooks/useTokens";
+import useStore, { accountSelector, principalSelector } from "../store";
 import { Token } from "../types";
-import Button from "./Button";
 import Logo from "./Logo";
 import Modal from "./Modal";
 import SearchInput from "./SearchInput";
