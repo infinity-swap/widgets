@@ -16,6 +16,14 @@ import createSlippageSlice, {
   slippageSelector,
   setSlippageSelector,
 } from "./slippage.slice";
+import createWidgetSlice, {
+  icNetworkSelector,
+  setIcNetworkSelector,
+  inputTokenSymbolSelector,
+  outputTokenSymbolSelector,
+  setInputTokenSymbolSelector,
+  setOutputTokenSymbolSelector,
+} from "./widget.slice";
 
 export const rehydrated =
   (config: any) => (set: SetState<any>, get: GetState<any>, api: any) => {
@@ -36,6 +44,7 @@ const useStore = create(
       rehydrated((set: SetState<any>, get: GetState<any>) => ({
         ...createAuthSlice(set, get),
         ...createSlippageSlice(set, get),
+        ...createWidgetSlice(set, get),
       })),
       {
         name: "infinity-swap-widget",
@@ -57,5 +66,11 @@ export {
   setUnlockedSelector,
   setConnectedToSelector,
   setActiveConnectionSelector,
+  icNetworkSelector,
+  setIcNetworkSelector,
+  inputTokenSymbolSelector,
+  outputTokenSymbolSelector,
+  setInputTokenSymbolSelector,
+  setOutputTokenSymbolSelector,
 };
 export default useStore;

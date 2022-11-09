@@ -1,3 +1,15 @@
+export interface TokenInfo {
+  readonly chainId: number;
+  readonly address: string;
+  readonly name: string;
+  readonly decimals: number;
+  readonly symbol: string;
+  readonly logoURI?: string;
+  readonly tags?: string[];
+  readonly extensions?: {
+    readonly [key: string]: string | number | boolean | null;
+  };
+}
 export interface Theme {
   accent?: string;
   container?: string;
@@ -35,5 +47,35 @@ export interface WidgetProps {
   width?: string | number;
   // dialog?: HTMLElement | null;
   className?: string;
+
   // onError?: ErrorHandler;
+}
+export interface icNetworkType {
+  icHost: string;
+  icEnviron: string;
+  MAINNET_LEDGER_CANISTER_ID?: string;
+  CANISTER_IDS_URL?: string;
+}
+
+export interface SwapProps {
+  tokenList?: string | TokenInfo[];
+  principalId?: string;
+  accountId?: string;
+  icNetwork?: icNetworkType;
+  onConnectWallet?: () => void;
+  defaultInputAmount?: string | number;
+  defaultOutputTokenSymbol?: string;
+  defaultInputTokenSymbol?: string;
+  onError?: (e: any) => void;
+  onSuccess?: (e: any) => void;
+}
+export interface WidgetSliceProps {
+  icNetwork: icNetworkType | null;
+  defaultInputTokenSymbol: string | null;
+  defaultOutputTokenSymbol: string | null;
+  defaultInputAmount?: string | number;
+  setIcNetwork: (icNetwork: icNetworkType) => void;
+  setDefaultInputTokenSymbol: (symbol: string | null) => void;
+  setDefaultOutputTokenSymbol: (symbol: string | null) => void;
+  setDefaultInputAmount: (defaultInputAmount: string | number) => void;
 }
