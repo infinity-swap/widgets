@@ -47,8 +47,6 @@ export interface WidgetProps {
   width?: string | number;
   // dialog?: HTMLElement | null;
   className?: string;
-
-  // onError?: ErrorHandler;
 }
 export interface icNetworkType {
   icHost: string;
@@ -71,11 +69,11 @@ export interface SwapProps {
 }
 export interface WidgetSliceProps {
   icNetwork: icNetworkType | null;
-  defaultInputTokenSymbol: string | null;
-  defaultOutputTokenSymbol: string | null;
-  defaultInputAmount?: string | number;
+  inputTokenSymbol: string | null;
+  outputTokenSymbol: string | null;
+  InputAmount?: string | number;
   setIcNetwork: (icNetwork: icNetworkType) => void;
-  setDefaultInputTokenSymbol: (symbol: string | null) => void;
-  setDefaultOutputTokenSymbol: (symbol: string | null) => void;
-  setDefaultInputAmount: (defaultInputAmount: string | number) => void;
+  setInputTokenSymbol: (symbol: string | null) => void;
+  setOutputTokenSymbol: (symbol: string | null) => void;
+  setInputAmount: (InputAmount: string | number) => void;
 }
