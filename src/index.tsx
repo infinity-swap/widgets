@@ -6,7 +6,7 @@ import { UserWalletProvider } from "./contexts/UserWallet";
 import { ThemeProvider } from "./contexts/themeContext";
 import { getRejectErrorCode } from "./utils/canisterErrorHandler";
 import { SwapProps, WidgetProps } from "./types";
-import SwapWidgetComponent from "./components/widgets/SwapWidgetComponent";
+import SwapWidgetComponent from "./components/widgets";
 import "./assets/style.css";
 
 const queryClient = new QueryClient({
@@ -17,10 +17,6 @@ const queryClient = new QueryClient({
         const icError = getRejectErrorCode(error);
 
         if (icError && !icError.retry) {
-          if (icError.notify) {
-            //errorNotify(icError.message);
-          }
-
           return false;
         }
 

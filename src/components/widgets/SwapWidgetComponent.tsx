@@ -3,7 +3,9 @@ import { Controller, useForm } from "react-hook-form";
 import Header from "../Header";
 import Input from "../Input";
 import useStore, {
+  accountSelector,
   connectedToSelector,
+  inputTokenSymbolSelector,
   principalSelector,
   slippageSelector,
 } from "../../store";
@@ -57,9 +59,10 @@ import {
 } from "../../ic/idl/ledger/ledger.did";
 import { PairErrorResponse, SwapProps, Token, WidgetProps } from "../../types";
 import { Principal } from "@dfinity/principal";
-import Ic from "../../ic";
+import Ic, { IcConnector } from "../../ic";
 import { SubAccount } from "../../ic/account";
 import { ThemeContext } from "../../contexts/themeContext";
+import useTokens, { useTokensWithUserBalance } from "../../hooks/useTokens";
 
 const WhichToken = {
   IN: 1,
@@ -71,8 +74,8 @@ interface FormValues {
   outToken: Token;
   changeToken: number;
   slippage: number | null;
-  inAmount: number;
-  outAmount: number;
+  inAmount: number | string;
+  outAmount: number | string;
 }
 
 const SwapSteps = [
@@ -112,9 +115,12 @@ const refundTransferStep = {
 export default function SwapWidgetComponent({
   theme,
   onConnectWallet = null,
-  icNetwork,
+  defaultInputAmount,
+  defaultOutputTokenSymbol,
+  defaultInputTokenSymbol,
 }: WidgetProps & SwapProps) {
   const [selectPair, toggleSelectPair] = useState<boolean>(false);
+  const accountIdentifier = useStore(accountSelector);
   const [pTracker, pTrackerDispatch] = useProgressTracker(initProgressTracker);
   const canisterIds = useCanisterIds();
   const [poolId, setPoolId] = useState<string | null>(null);
@@ -124,6 +130,11 @@ export default function SwapWidgetComponent({
   const storedSlippage = useStore(slippageSelector);
   const principalId = useStore(principalSelector);
   const [showTest, setShowTest] = useState(false);
+  const { tokens } = useTokensWithUserBalance({
+    principalId,
+    accountIdentifier,
+  });
+
   const {
     resetField,
     control,
@@ -138,7 +149,7 @@ export default function SwapWidgetComponent({
       outToken: { id: "", fee: BigInt(0), decimals: 0 },
       changeToken: WhichToken.IN,
       slippage: storedSlippage,
-      inAmount: 0,
+      inAmount: defaultInputAmount,
       outAmount: 0,
     },
   });
@@ -146,24 +157,42 @@ export default function SwapWidgetComponent({
   const { mutateAsync: inSwapParameterCall } = useInSwapParameters();
   const { inAmount, outAmount, slippage, inToken, outToken, changeToken } =
     watch();
+  const defaultInputSymbol = useStore(inputTokenSymbolSelector);
   const [toggleSwitch, setToggleSwitch] = useState(false);
   const [isFetchingPrice, setFetchingPrice] = useState(false);
   const [emptyLiquidity, setEmptyLiquidity] = useState(false);
   const connectedTo = useStore(connectedToSelector);
   const isMountedRef = useRef(true);
+  setCSSVariables(theme);
 
   useEffect(() => {
-    setIcNetwork({
-      icHost: icNetwork?.icHost || IC_HOST,
-      icEnviron: icNetwork?.icEnviron || IC_ENVIRON,
-      MAINNET_LEDGER_CANISTER_ID:
-        icNetwork?.MAINNET_LEDGER_CANISTER_ID || MAINNET_LEDGER_CANISTER_ID,
-      CANISTER_IDS_URL: icNetwork?.CANISTER_IDS_URL || CANISTER_IDS_URL,
-    });
-    setCSSVariables(theme);
-  }, [theme, icNetwork]);
+    if (tokens.length) {
+      const inputToken = tokens.find(
+        (token) =>
+          token.symbol
+            .toLowerCase()
+            .includes(defaultInputTokenSymbol.toLowerCase()) ||
+          token.symbol
+            .toLowerCase()
+            .includes(defaultInputTokenSymbol.toLowerCase())
+      );
 
-  //setWidgetOptions({ onConnecWallet: () => console.log("connect wallet") });
+      const outputToken = tokens.find(
+        (token) =>
+          token.symbol
+            .toLowerCase()
+            .includes(defaultOutputTokenSymbol.toLowerCase()) ||
+          token.symbol
+            .toLowerCase()
+            .includes(defaultOutputTokenSymbol.toLowerCase())
+      );
+      setValue("inToken", inputToken);
+      setValue("outToken", outputToken);
+      if (inputToken && outputToken) {
+        inSwapParameters();
+      }
+    }
+  }, [tokens]);
 
   const selectedPool = useFindPool({
     token0: inToken?.id,
