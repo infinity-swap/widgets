@@ -7,22 +7,28 @@ import {
 } from "@dfinity/agent";
 import { IDL } from "@dfinity/candid";
 import { Principal } from "@dfinity/principal";
+import { useSwapProps } from "../hooks/useSwapProps";
 import { IC_ENVIRON, IC_HOST } from "../shared/constants";
+import useStore from "../store";
 
 interface IcConnectorOptions {
   host?: string;
   identity?: Identity | undefined;
+  environ?: string;
 }
 
 export class IcConnector {
   private host: string;
-  private identity: Identity | undefined;
+  private identity?: Identity | undefined;
   private agent: HttpAgent;
+  private environ: string;
 
   constructor(options: IcConnectorOptions | undefined = {}) {
-    this.host = options.host ?? IC_HOST;
+    const icNetwork = useStore.getState().icNetwork;
+    this.host = options.host || icNetwork.icHost;
     this.identity = options.identity ?? undefined;
     this.agent = this.initAgent();
+    this.environ = options.environ || icNetwork?.icEnviron;
   }
 
   initAgent() {
