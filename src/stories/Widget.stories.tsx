@@ -15,10 +15,6 @@ const changeTheme = () => {
   theme = { textDark: "red" };
 };
 
-const accountId =
-  "2d628dd4eb5e1ece469ee49473d8556a2899973f1c7ea3b70c5d442a9713cc7b";
-const principalId =
-  "lobus-dmxw4-q4hcu-booky-76n5a-lpgcv-2bhd2-uihsp-cn4o5-nofux-jqe";
 export const Widget = () => (
   <div>
     <SwapWidget
