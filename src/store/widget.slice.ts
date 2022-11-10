@@ -3,14 +3,10 @@ import { StoreSlice, WidgetSliceProps } from "../types";
 export const icNetworkSelector = (state: WidgetSliceProps) => state.icNetwork;
 export const setIcNetworkSelector = (state: WidgetSliceProps) =>
   state.setIcNetwork;
-export const inputTokenSymbolSelector = (state: WidgetSliceProps) =>
-  state.inputTokenSymbol;
-export const outputTokenSymbolSelector = (state: WidgetSliceProps) =>
-  state.outputTokenSymbol;
-export const setOutputTokenSymbolSelector = (state: WidgetSliceProps) =>
-  state.setOutputTokenSymbol;
-export const setInputTokenSymbolSelector = (state: WidgetSliceProps) =>
-  state.setInputTokenSymbol;
+export const customActionSelector = (state: WidgetSliceProps) =>
+  state.customActions;
+export const setCustomActionSelector = (state: WidgetSliceProps) =>
+  state.setCustomAction;
 
 export const defaultIcNetwork = {
   icHost: "http://localhost:8001",
@@ -21,12 +17,14 @@ export const defaultIcNetwork = {
 
 const createWidgetSlice: StoreSlice<WidgetSliceProps> = (set, get) => ({
   icNetwork: { ...defaultIcNetwork },
-  inputTokenSymbol: null,
-  outputTokenSymbol: null,
-  setInputTokenSymbol: (value) => set({ inputTokenSymbol: value }),
-  setOutputTokenSymbol: (value) => set({ outputTokenSymbol: value }),
+  InputAmount: 0,
+  customActions: {
+    onSuccess: () => {},
+    onError: () => {},
+  },
   setInputAmount: (value) => set({ InputAmount: Number(value) }),
   setIcNetwork: (value) => set({ icNetwork: value }),
+  setCustomAction: (value) => set({ customActions: value }),
 });
 
 export default createWidgetSlice;

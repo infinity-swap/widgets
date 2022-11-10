@@ -67,13 +67,16 @@ export interface SwapProps {
   onError?: (e: any) => void;
   onSuccess?: (e: any) => void;
 }
+export interface actionType {
+  onError?: (e: any) => void | null;
+  onSuccess?: (e: any) => void | null;
+}
 export interface WidgetSliceProps {
   icNetwork: icNetworkType | null;
-  inputTokenSymbol: string | null;
-  outputTokenSymbol: string | null;
   InputAmount?: string | number;
   setIcNetwork: (icNetwork: icNetworkType) => void;
-  setInputTokenSymbol: (symbol: string | null) => void;
-  setOutputTokenSymbol: (symbol: string | null) => void;
+  customActions: actionType;
+  // setActions: (action: actionType) => void;
+  setCustomAction: (customActions: actionType) => void;
   setInputAmount: (InputAmount: string | number) => void;
 }

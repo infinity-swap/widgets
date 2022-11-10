@@ -5,7 +5,7 @@ import Input from "../Input";
 import useStore, {
   accountSelector,
   connectedToSelector,
-  inputTokenSymbolSelector,
+  customActionSelector,
   principalSelector,
   slippageSelector,
 } from "../../store";
@@ -118,9 +118,12 @@ export default function SwapWidgetComponent({
   defaultInputAmount,
   defaultOutputTokenSymbol,
   defaultInputTokenSymbol,
+  onSuccess = () => {},
+  onError = () => {},
 }: WidgetProps & SwapProps) {
   const [selectPair, toggleSelectPair] = useState<boolean>(false);
   const accountIdentifier = useStore(accountSelector);
+  const customActions = useStore(customActionSelector);
   const [pTracker, pTrackerDispatch] = useProgressTracker(initProgressTracker);
   const canisterIds = useCanisterIds();
   const [poolId, setPoolId] = useState<string | null>(null);
@@ -157,7 +160,6 @@ export default function SwapWidgetComponent({
   const { mutateAsync: inSwapParameterCall } = useInSwapParameters();
   const { inAmount, outAmount, slippage, inToken, outToken, changeToken } =
     watch();
-  const defaultInputSymbol = useStore(inputTokenSymbolSelector);
   const [toggleSwitch, setToggleSwitch] = useState(false);
   const [isFetchingPrice, setFetchingPrice] = useState(false);
   const [emptyLiquidity, setEmptyLiquidity] = useState(false);
@@ -611,6 +613,10 @@ export default function SwapWidgetComponent({
                 /*  notification.success({
                   description: `Swapped ${inAmountDp} ${sToken.inToken.symbol} for ${outAmountDp} ${sToken.outToken.symbol}`,
                 }); */
+                onSuccess({
+                  status: "Ok",
+                  message: `Swapped ${inAmountDp} ${sToken.inToken.symbol} for ${outAmountDp} ${sToken.outToken.symbol}`,
+                });
                 console.log("success");
               }
               if (Err) {

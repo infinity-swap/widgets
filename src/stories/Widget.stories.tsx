@@ -15,6 +15,11 @@ const changeTheme = () => {
   theme = { textDark: "red" };
 };
 
+const onSuccess = (e) => {
+  console.log(e);
+  alert(e?.message);
+};
+
 export const Widget = () => (
   <div>
     <SwapWidget
@@ -31,7 +36,7 @@ export const Widget = () => (
       defaultInputAmount="1"
       defaultOutputTokenSymbol="TKN1"
       defaultInputTokenSymbol="T-ICP"
-      onSuccess={() => console.log("it a successful swap")}
+      onSuccess={(e) => onSuccess(e)}
       onError={() => console.log("oh no there was an error")}
     />
   </div>
