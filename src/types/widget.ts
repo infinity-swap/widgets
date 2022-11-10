@@ -76,7 +76,6 @@ export interface WidgetSliceProps {
   InputAmount?: string | number;
   setIcNetwork: (icNetwork: icNetworkType) => void;
   customActions: actionType;
-  // setActions: (action: actionType) => void;
   setCustomAction: (customActions: actionType) => void;
   setInputAmount: (InputAmount: string | number) => void;
 }

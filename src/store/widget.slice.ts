@@ -1,3 +1,9 @@
+import {
+  CANISTER_IDS_URL,
+  IC_ENVIRON,
+  IC_HOST,
+  MAINNET_LEDGER_CANISTER_ID,
+} from "../shared/constants";
 import { StoreSlice, WidgetSliceProps } from "../types";
 
 export const icNetworkSelector = (state: WidgetSliceProps) => state.icNetwork;
@@ -9,10 +15,10 @@ export const setCustomActionSelector = (state: WidgetSliceProps) =>
   state.setCustomAction;
 
 export const defaultIcNetwork = {
-  icHost: "http://localhost:8001",
-  icEnviron: "local",
-  MAINNET_LEDGER_CANISTER_ID: "ryjl3-tyaaa-aaaaa-aaaba-cai",
-  CANISTER_IDS_URL: "http://localhost:8001/static/canister_ids.json",
+  icHost: IC_HOST,
+  icEnviron: IC_ENVIRON,
+  MAINNET_LEDGER_CANISTER_ID: MAINNET_LEDGER_CANISTER_ID,
+  CANISTER_IDS_URL: CANISTER_IDS_URL,
 };
 
 const createWidgetSlice: StoreSlice<WidgetSliceProps> = (set, get) => ({
