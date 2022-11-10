@@ -173,20 +173,20 @@ export default function SwapWidgetComponent({
         (token) =>
           token.symbol
             .toLowerCase()
-            .includes(defaultInputTokenSymbol.toLowerCase()) ||
+            .includes(defaultInputTokenSymbol?.toLowerCase()) ||
           token.symbol
             .toLowerCase()
-            .includes(defaultInputTokenSymbol.toLowerCase())
+            .includes(defaultInputTokenSymbol?.toLowerCase())
       );
 
       const outputToken = tokens.find(
         (token) =>
           token.symbol
             .toLowerCase()
-            .includes(defaultOutputTokenSymbol.toLowerCase()) ||
+            .includes(defaultOutputTokenSymbol?.toLowerCase()) ||
           token.symbol
             .toLowerCase()
-            .includes(defaultOutputTokenSymbol.toLowerCase())
+            .includes(defaultOutputTokenSymbol?.toLowerCase())
       );
       setValue("inToken", inputToken);
       setValue("outToken", outputToken);
@@ -194,7 +194,7 @@ export default function SwapWidgetComponent({
         inSwapParameters();
       }
     }
-  }, [tokens]);
+  }, [tokens, defaultInputTokenSymbol, defaultOutputTokenSymbol]);
 
   const selectedPool = useFindPool({
     token0: inToken?.id,
@@ -753,7 +753,7 @@ export default function SwapWidgetComponent({
       />
 
       <div className="">
-        <div className="bg-[var(--container)] px-4 pt-5 pb-4 sm:p-4 sm:pb-4 w-full md:w-[360px]">
+        <div className="bg-[var(--container)] px-4 pt-5 pb-4 sm:p-4 sm:pb-4 w-[var(--width)]">
           {/* Header */}
           <div>
             <Header
