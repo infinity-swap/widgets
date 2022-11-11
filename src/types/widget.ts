@@ -37,7 +37,7 @@ export interface Theme {
   interactiveBorderRadius?: string;
   placeholder?: string;
   currentColor?: "currentColor";
-  width: string;
+  width?: string;
 }
 
 export interface WidgetProps {
