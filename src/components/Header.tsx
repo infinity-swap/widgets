@@ -41,7 +41,7 @@ export default function Header({
           <div>
             <SettingsIcon
               onClick={onOpenSettings}
-              className="cursor-pointer fill-black"
+              className="cursor-pointer fill-[var(--textDark)]"
             />
           </div>
         </div>

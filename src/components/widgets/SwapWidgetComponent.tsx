@@ -808,7 +808,7 @@ export default function SwapWidgetComponent({
               />
               <div
                 data-testid="swp-arrow-container"
-                className="flex justify-center items-center rounded-md absolute bg-white dark:bg-dark-900 h-[32px] w-[32px] cursor-pointer z-1 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"
+                className="flex justify-center items-center rounded-md absolute bg-[var(--interactive)] border border-[var(--interactiveBorder)] dark:bg-dark-900 h-[32px] w-[32px] cursor-pointer z-1 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"
                 onClick={swapInput}
               >
                 <div className="bg-primary-200 dark:bg-dark-200 rounded-md">
@@ -865,9 +865,9 @@ export default function SwapWidgetComponent({
             </div>
             <div className="mt-2">
               {isFetchingPrice && (
-                <div className="flex items-center">
+                <div className="flex items-center text-[var(--textDark)]">
                   <Loader height={25} width={25} />
-                  <span className="pl-2 capitalize ">Fetching prices....</span>
+                  <span className="pl-2 capitalize">Fetching prices....</span>
                 </div>
               )}
             </div>

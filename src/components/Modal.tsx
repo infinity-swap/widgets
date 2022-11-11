@@ -45,7 +45,7 @@ function Modal({ isOpen = false, onClose, children, zIndex = 10 }: ModalProps) {
               ></div>
               <div className="relative w-auto my-6 mx-auto max-w-3xl">
                 {/*content*/}
-                <div className="relative transform overflow-hidden rounded-lg  bg-white text-left shadow-xl transition-all sm:my-8 ">
+                <div className="relative transform overflow-hidden rounded-lg  bg-[var(--dialog)] text-left shadow-xl transition-all sm:my-8 ">
                   {children}
                 </div>
               </div>
