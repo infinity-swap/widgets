@@ -17,7 +17,6 @@ interface IcConnectorOptions {
   identity?: Identity | undefined;
   environ?: string;
 }
-
 export class IcConnector {
   private host: string;
   private identity?: Identity | undefined;
@@ -36,7 +35,8 @@ export class IcConnector {
       host: this.host,
       identity: this.identity,
     });
-    if (icNetwork.IC_ENVIRON === "local") {
+
+    if (icNetwork.icEnviron === "local") {
       agent.fetchRootKey();
     }
     return agent;
