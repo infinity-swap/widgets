@@ -65,3 +65,48 @@ function App() {
 }
 ```
 
+### Customizing the Default Input and Output Tokens
+
+
+It is possible to pre-populate input and output token fields by setting the `defaultInputAmount`, `defaultOutputTokenSymbol`, and `defaultOutputTokenSymbol` variables.
+
+See example below,
+
+
+
+```javascript
+
+function App() {
+  return (
+    <div>
+      <SwapWidget 
+        theme={theme} 
+        defaultInputAmount="1"
+        defaultOutputTokenSymbol="TKN1"
+        defaultInputTokenSymbol="T-ICP"
+      />
+    </div>
+  )
+}
+```
+### Swap Widget API  Reference (Optional props)
+
+
+| Prop Name                  | Prop Type.          | Default Value.       | Description                                     |
+| :--------------------------| :--------------     | :------------------- | :---------------------------------------------- |
+| `theme`                    | `object`            |    `lightTheme`                  | Theme prop defines the theme of the widget|
+| `onConnectWallet`          | `() => void`          |                      | If passed, allows you to add custom behavior when the user clicks on the 'Connect your wallet to swap' button. |
+| `defaultInputAmount`       | `number`              | 0                    | Default amount for inToken |
+| `defaultOutputTokenSymbol` | `string`            |                      | The default output token symbol for the output token field eg. ` defaultOutputTokenSymbol="icp" ` |
+| `defaultInputTokenSymbol`  | `string`            |                      |  The default input token symbol for the input token field eg. ` defaultInputTokenSymbol="icp" `                              |
+| `onError`                | `(e) => void`         |                      | Widget error handler for Javascript errors.|
+|`onSuccess`                   | `(e) => void`         |                      | A handler that is called when a transaction succeeds
+|
+
+
+
+
+## License
+
+[MIT](https://choosealicense.com/licenses/mit/)
+
