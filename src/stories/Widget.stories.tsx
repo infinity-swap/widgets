@@ -5,7 +5,7 @@ import { SwapWidget } from "..";
 
 export const StoryChangingTheTheme = () => {
   const { globalState, dispatch } = useLadleContext();
-  const [theme, setTheme] = React.useState({ textDark: "blue" });
+  const [theme, setTheme] = React.useState();
 
   const darkTheme = {
     primary: "rgba(32, 122, 249, 1)",
@@ -21,38 +21,46 @@ export const StoryChangingTheTheme = () => {
     interactive: "#4E4E5A",
     interactiveBorder: "rgba(138, 154, 185, 0.2)",
     interactiveBorderRadius: "9999px",
-    width: "360px",
+    width: "560px",
   };
+
   const changeTheme = (payload) => {
     setTheme(payload);
   };
   const onConnectWallet = () => {
     alert("I will handle my own wallet connection ");
   };
+
+  const onSuccess = (e) => {
+    console.log(e);
+    alert(e?.message);
+  };
   return (
     <>
       <p>Active theme: </p>
-      <button
-        onClick={() => changeTheme({ textDark: "red", container: "black" })}
-      >
-        change Theme 1
-      </button>
-      <button onClick={() => changeTheme(darkTheme)}>dark Theme</button>
+      <div>
+        <button
+          onClick={() => changeTheme({ textDark: "red", container: "black" })}
+        >
+          change Theme 1
+        </button>
+        <button onClick={() => changeTheme(darkTheme)}>dark Theme</button>
+      </div>
       <SwapWidget
         theme={theme}
         // onConnectWallet={() => onConnectWallet()}
         //accountId = {accountId}
         // principalId = principalId=""
-        /* icNetwork={{
-        icHost: "http://localhost:8000",
-        icEnviron: "local",
-        MAINNET_LEDGER_CANISTER_ID: "ryjl3-tyaaa-aaaaa-aaaba-cai",
-        CANISTER_IDS_URL: "http://localhost:8001/static/canister_ids.json",
-      }} */
-        //defaultInputAmount="1"
-        //defaultOutputTokenSymbol="TKN1"
-        //defaultInputTokenSymbol="T-ICP"
-        //onSuccess={(e) => onSuccess(e)}
+        icNetwork={{
+          icHost: "http://localhost:8000",
+          icEnviron: "local",
+          MAINNET_LEDGER_CANISTER_ID: "ryjl3-tyaaa-aaaaa-aaaba-cai",
+          CANISTER_IDS_URL: "http://localhost:8001/static/canister_ids.json",
+        }}
+        defaultInputAmount="1"
+        defaultOutputTokenSymbol="TKN1"
+        defaultInputTokenSymbol="T-ICP"
+        onSuccess={(e) => onSuccess(e)}
         // onError={() => console.log("oh no there was an error")}
       />
     </>
