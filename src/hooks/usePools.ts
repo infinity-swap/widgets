@@ -14,10 +14,11 @@ import {
   _SERVICE as PairService,
 } from "../ic/idl/pair/pair.did";
 import Ic from "../ic";
-import { IC_ENVIRON } from "../shared/constants";
 import { Principal } from "@dfinity/principal";
 import { PoolStatsType } from "../types";
-import { useMemo } from "react";
+import { useContext, useMemo } from "react";
+import { ConnectWalletContext } from "../contexts/ConnectWallet";
+import useStore, { icNetworkSelector } from "../store";
 
 interface fetchPoolsProps {
   pairFactory: string;
@@ -37,61 +38,66 @@ const fetchPools = async ({
   ledger,
   ledgerTest,
 }: fetchPoolsProps) => {
-  const pairs: Principal[] = await Ic.actor<PairFactoryService>(
-    pairFactory,
-    PairFactoryIDL
-  ).get_all();
+  try {
+    const pairs: Principal[] = await Ic.actor<PairFactoryService>(
+      pairFactory,
+      PairFactoryIDL
+    ).get_all();
 
-  const pairStats = await Promise.all(
-    pairs.map((pair) => Ic.actor<PairService>(pair.toText(), PairIDL).stats())
-  );
+    const pairStats = await Promise.all(
+      pairs.map((pair) => Ic.actor<PairService>(pair.toText(), PairIDL).stats())
+    );
 
-  let pools: PoolStatsType[] = pairStats.map((stats: any, index) => ({
-    id: pairs[index].toText(),
-    token0: stats.token0.toText(),
-    token1: stats.token1.toText(),
-    owner: stats.owner,
-    token1_reserve: stats.token1_reserve,
-    token0_price: stats.token0_price,
-    weights_are_changing: stats.weights_are_changing,
-    weights: stats.weights,
-    token0_reserve: stats.token0_reserve,
-    token1_price: stats.token1_price,
-    transit_amount: stats.transit_amount,
-    last_tx_id: stats.last_tx_id,
-    protocol_fee_enabled: stats.protocol_fee_enabled,
-    weights_can_change: stats.weights_can_change,
-    total_supply: stats.total_supply,
-  }));
+    let pools: PoolStatsType[] = pairStats.map((stats: any, index) => ({
+      id: pairs[index].toText(),
+      token0: stats.token0.toText(),
+      token1: stats.token1.toText(),
+      owner: stats.owner,
+      token1_reserve: stats.token1_reserve,
+      token0_price: stats.token0_price,
+      weights_are_changing: stats.weights_are_changing,
+      weights: stats.weights,
+      token0_reserve: stats.token0_reserve,
+      token1_price: stats.token1_price,
+      transit_amount: stats.transit_amount,
+      last_tx_id: stats.last_tx_id,
+      protocol_fee_enabled: stats.protocol_fee_enabled,
+      weights_can_change: stats.weights_can_change,
+      total_supply: stats.total_supply,
+    }));
 
-  const poolSymbols = await Promise.all(
-    pools.map((pool) => {
-      const promises = [pool.token0, pool.token1].map((token) => {
-        if (ledger === token) {
-          return Promise.resolve("ICP");
-        }
+    const poolSymbols = await Promise.all(
+      pools.map((pool) => {
+        const promises = [pool.token0, pool.token1].map((token) => {
+          if (ledger === token) {
+            return Promise.resolve("ICP");
+          }
 
-        if (ledgerTest === token) {
-          return Promise.resolve("T-ICP");
-        }
+          if (ledgerTest === token) {
+            return Promise.resolve("T-ICP");
+          }
 
-        return Ic.actor<TokenService>(token, TokenIDL).icrc1_symbol();
-      });
-      return Promise.all(promises);
-    })
-  );
+          return Ic.actor<TokenService>(token, TokenIDL).icrc1_symbol();
+        });
+        return Promise.all(promises);
+      })
+    );
 
-  pools = pools.map((pool, index) => {
-    const [symbol0, symbol1] = poolSymbols[index];
-    return {
-      ...pool,
-      symbol: `${symbol0} / ${symbol1}`,
-    };
-  });
-  return pools;
+    pools = pools.map((pool, index) => {
+      const [symbol0, symbol1] = poolSymbols[index];
+      return {
+        ...pool,
+        symbol: `${symbol0} / ${symbol1}`,
+      };
+    });
+    return pools;
+  } catch (error) {
+    console.log("fetch pools error", error);
+  }
 };
 
 export default function usePools() {
+  const icNetwork = useStore(icNetworkSelector);
   const { pairFactory, ledger, ledgerTest } = useCanisterIds();
   const { data } = useQuery(
     ["pools", pairFactory, ledger, ledgerTest],
@@ -99,7 +105,7 @@ export default function usePools() {
     {
       enabled: !!(
         pairFactory &&
-        (IC_ENVIRON === "testnet" ? ledger && ledgerTest : ledgerTest)
+        (icNetwork.icEnviron === "testnet" ? ledger && ledgerTest : ledgerTest)
       ),
     }
   );

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { useQuery } from "react-query";
 import { Principal } from "@dfinity/principal";
 import useCanisterIds from "./useCanisterIds";
@@ -15,7 +15,7 @@ import {
   _SERVICE as LedgerService,
 } from "../ic/idl/ledger/ledger.did";
 import usePools from "./usePools";
-import { PoolStatsType, Token } from "../types";
+import { icNetworkType, PoolStatsType, Token } from "../types";
 import {
   LEDGER_SYMBOLS,
   REAL_LEDGER_METADATA,

@@ -1,3 +1,4 @@
+import React from "react";
 import { useState, useMemo, createContext, ReactNode } from "react";
 
 export const ConnectWalletContext = createContext<any>({} as any);
@@ -10,6 +11,8 @@ export const ConnectWalletProvider = ({
   const [showModalType, toggleConnectModal] = useState("");
   const [forced, setForced] = useState(false);
   const [walletStep, setWalletStep] = useState(1);
+  const [widgetOptions, setWidgetOptions] = useState();
+  const [icNetwork, setIcNetwork] = useState();
 
   const value = useMemo(
     () => ({
@@ -19,6 +22,10 @@ export const ConnectWalletProvider = ({
       toggleConnectModal,
       walletStep,
       setWalletStep,
+      widgetOptions,
+      setWidgetOptions,
+      icNetwork,
+      setIcNetwork,
     }),
     [
       toggleConnectModal,
@@ -27,6 +34,10 @@ export const ConnectWalletProvider = ({
       setForced,
       walletStep,
       setWalletStep,
+      widgetOptions,
+      setWidgetOptions,
+      icNetwork,
+      setIcNetwork,
     ]
   );
 

@@ -1,6 +1,5 @@
 import React from "react";
-import { SettingsIcon } from "../assets/svg/setting";
-// import RectangleIcon from "../assets/svg/primary-online-rectangle.svg";
+import { SettingsIcon, RectangleIcon } from "../assets/svg/Icons";
 import useStore, { principalSelector } from "../store";
 
 interface HeaderProps {
@@ -30,7 +29,9 @@ export default function Header({
             {principalId ? (
               <div className="w-24 flex items-center space-x-1 truncate">
                 {" "}
-                <span>{/*  <RectangleIcon /> */}</span>
+                <span>
+                  <RectangleIcon />{" "}
+                </span>
                 <span>{principalId}</span>
               </div>
             ) : (
@@ -39,8 +40,8 @@ export default function Header({
           </div>
           <div>
             <SettingsIcon
-            //onClick={onOpenSettings}
-            //className="cursor-pointer fill-black"
+              onClick={onOpenSettings}
+              className="cursor-pointer fill-[var(--textDark)]"
             />
           </div>
         </div>

@@ -1,5 +1,5 @@
-import PlugIcon from "../assets/svg/wallets/plug.svg";
-import InfinityWalletIcon from "../assets/svg/wallets/infinitylogo.svg";
+import { PlugIcon } from "../assets/svg/wallets/plug";
+import { InfinityLogo } from "../assets/svg/wallets/infinitylogo";
 import { PairErrorResponse, walletType } from "../types";
 import numbro from "numbro";
 import { defaultDecimal } from "../shared/constants";
@@ -14,7 +14,7 @@ export const WALLETS: walletType[] = [
     id: WALLET_IDS.INFINITY_WALLET,
     exposedName: "infinityWallet",
     name: "InfinityWallet",
-    Icon: InfinityWalletIcon,
+    Icon: InfinityLogo,
     installation:
       "https://chrome.google.com/webstore/detail/infinity-wallet/jnldfbidonfeldmalbflbmlebbipcnle",
   },

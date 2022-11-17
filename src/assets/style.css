@@ -18,6 +18,7 @@
   --interactiveBorder: rgba(138, 154, 185, 0.2);
   --interactiveBorderRadius: 9999px;
   --placeholder: ;
+  --width: 360px;
 }
 
 .swap-widget.dark {
@@ -36,4 +37,5 @@
   --interactiveBorder: rgba(138, 154, 185, 0.2);
   --interactiveBorderRadius: 9999px;
   --placeholder: ;
+  --width: 360px;
 }

@@ -1,5 +1,5 @@
 import React from "react";
-import SearchIcon from "../assets/svg/search.svg";
+import { SearchIcon } from "../assets/svg/Icons";
 
 interface SearchInputProps extends React.ComponentPropsWithoutRef<"input"> {}
 
@@ -7,7 +7,7 @@ export default function SearchInput({ ...rest }: SearchInputProps) {
   return (
     <div className="w-full rounded-lg h-9 flex flex-row items-center border border-solid border-[] bg-[var(--inputBorder]">
       <div className="m-3">
-        <SearchIcon height={16} />
+        <SearchIcon className="h-[16px] stroke-[var(--textDark)]" />
       </div>
       <input
         {...rest}

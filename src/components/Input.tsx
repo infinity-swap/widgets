@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import Logo from "./Logo";
-// import Arrow from "../assets/svg/dropdown-arrow.svg";
+import { DropdownIcon } from "../assets/svg/Icons";
 import { formatNum } from "../utils";
 interface InputProps {
   className?: string;
@@ -84,7 +84,10 @@ export default function Input({
             className="bg-[var(--interactive)]  dark:bg-dark-900 p-[8px] rounded-[var(--interactiveBorderRadius)] border border-[var(--interactiveBorder)]"
           >
             <div className="flex items-center space-x-2">
-              <span>{/*  <Logo symbol={name} logoURI={logo} /> */}</span>
+              <span>
+                {" "}
+                <Logo symbol={name} logoURI={logo} />
+              </span>
               <span
                 className={`body-primary-semibold text-[var(--textDark)] whitespace-nowrap 
               ${disableSelection && "pr-5"}`}
@@ -94,11 +97,11 @@ export default function Input({
               </span>
               <div>
                 <div className="flex items-center justify-center">
-                  {/*  <Arrow
+                  <DropdownIcon
                     className="cursor-pointer"
                     data-testid={`${testId}-arrow`}
                     onClick={() => onInputClick()}
-                  /> */}
+                  />
                 </div>
               </div>
             </div>

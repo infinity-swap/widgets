@@ -1,11 +1,18 @@
 {
   "name": "swapwidget",
-  "version": "1.0.0",
+  "version": "0.0.1",
   "description": "",
-  "main": "index.js",
+  "main": "dist/index.js",
+  "unpkg": "dist/apexcharts.js",
+  "jsdelivr": "dist/apexcharts.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/infinity-swap/widgets"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "ladle": "ladle serve"
+    "ladle": "ladle serve",
+    "build": "tsup"
   },
   "eslintConfig": {
     "env": {
@@ -13,8 +20,16 @@
       "node": true
     }
   },
-  "author": "leleking",
-  "license": "ISC",
+  "author": "infinity-swap",
+  "license": "MIT",
+  "homepage": "https://infinityswap.one/",
+  "keywords": [
+    "infinityswap wallet"
+  ],
+  "resolutions": {
+    "**/react": "^18.2.0",
+    "**/react-dom": "^18.2.0"
+  },
   "dependencies": {
     "@dfinity/agent": "^0.11.1",
     "@dfinity/auth-client": "^0.11.1",
@@ -37,6 +52,7 @@
   },
   "devDependencies": {
     "@ladle/react": "^2.4.5",
+    "@swc/core": "^1.3.14",
     "@types/react": "^18.0.25",
     "@types/react-dom": "^18.0.8",
     "autoprefixer": "^10.4.13",
@@ -45,6 +61,7 @@
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "tailwindcss": "^3.2.2",
+    "tsup": "^6.4.0",
     "typescript": "^4.8.4"
   }
 }

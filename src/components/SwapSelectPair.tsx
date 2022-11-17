@@ -1,8 +1,7 @@
-import React from "react";
-import useTokens, { useTokensWithUserBalance } from "../hooks/useTokens";
+import React, { useState } from "react";
+import { useTokensWithUserBalance } from "../hooks/useTokens";
 import useStore, { accountSelector, principalSelector } from "../store";
 import { Token } from "../types";
-import Button from "./Button";
 import Logo from "./Logo";
 import Modal from "./Modal";
 import SearchInput from "./SearchInput";
@@ -23,17 +22,27 @@ export default function SwapSelectPair({
   title = "Select a Pair",
 }: SwapSelectPairType) {
   const principalId = useStore(principalSelector);
+
   const accountIdentifier = useStore(accountSelector);
+  const [search, setSearch] = useState("");
   const { tokens } = useTokensWithUserBalance({
     principalId,
     accountIdentifier,
   });
 
   const handleChange = (token: Token) => {
-    // setSearch("");
+    setSearch("");
     onChange(token);
     onClose();
   };
+
+  const ftokens = search
+    ? tokens.filter(
+        (token) =>
+          token.symbol.toLowerCase().includes(search.toLowerCase()) ||
+          token.symbol.toLowerCase().includes(search.toLowerCase())
+      )
+    : tokens;
 
   return (
     <Modal isOpen={isOpen} onClose={() => onClose()} zIndex={20}>
@@ -44,13 +53,16 @@ export default function SwapSelectPair({
           </div>
           <div className="flex justify-start flex-col mt-3">
             <div className="hidden sm:block h-[44px]">
-              <SearchInput placeholder="Search name or paste address" />
+              <SearchInput
+                placeholder="Search name or paste address"
+                onChange={(e) => setSearch(e.target.value)}
+              />
             </div>
           </div>
         </div>
         <div className="hidden sm:block border border-solid border-[var(--interactiveBorder)] mt-4 mb-1" />
         <div className="w-full flex flex-col max-h-[250px]  sm:max-h-[188px] overflow-y-scroll items-center px-[12px] pt-0 sm:pt-[16px]">
-          {tokens.map((token, index) => {
+          {ftokens.map((token, index) => {
             return (
               <div
                 key={index}
