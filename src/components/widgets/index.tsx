@@ -4,11 +4,11 @@ import useStore, {
   icNetworkSelector,
   setAccountSelector,
   setIcNetworkSelector,
-  setInputTokenSymbolSelector,
-  setOutputTokenSymbolSelector,
-  setPrincipalSelector,
 } from "../../store";
-import { defaultIcNetwork } from "../../store/widget.slice";
+import {
+  defaultIcNetwork,
+  setCustomActionSelector,
+} from "../../store/widget.slice";
 import { SwapProps, WidgetProps } from "../../types";
 import SwapWidgetComponent from "./SwapWidgetComponent";
 
@@ -19,21 +19,24 @@ export default function SwapWidget({
   defaultInputAmount = 0,
   defaultOutputTokenSymbol,
   defaultInputTokenSymbol,
+
+  onSuccess = () => {},
+  onError = () => {},
   principalId,
   accountId,
 }: WidgetProps & SwapProps) {
   const setIcNetwork = useStore(setIcNetworkSelector);
-  const setInputSymbol = useStore(setInputTokenSymbolSelector);
-  const setOutputSymbol = useStore(setOutputTokenSymbolSelector);
+  const setCustomActions = useStore(setCustomActionSelector);
   setIcNetwork(icNetwork ? icNetwork : defaultIcNetwork);
-  setInputSymbol(defaultInputTokenSymbol);
-  setOutputSymbol(defaultOutputTokenSymbol);
+  // setCustomActions({ onError, onSuccess });
 
   return (
     <div>
       <SwapWidgetComponent
         theme={theme}
         defaultInputAmount={defaultInputAmount}
+        onSuccess={onSuccess}
+        onError={onError}
         onConnectWallet={onConnectWallet}
         defaultInputTokenSymbol={defaultInputTokenSymbol}
         defaultOutputTokenSymbol={defaultOutputTokenSymbol}

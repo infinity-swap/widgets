@@ -37,6 +37,7 @@ export interface Theme {
   interactiveBorderRadius?: string;
   placeholder?: string;
   currentColor?: "currentColor";
+  width?: string;
 }
 
 export interface WidgetProps {
@@ -67,13 +68,15 @@ export interface SwapProps {
   onError?: (e: any) => void;
   onSuccess?: (e: any) => void;
 }
+export interface actionType {
+  onError?: (e: any) => void | null;
+  onSuccess?: (e: any) => void | null;
+}
 export interface WidgetSliceProps {
   icNetwork: icNetworkType | null;
-  inputTokenSymbol: string | null;
-  outputTokenSymbol: string | null;
   InputAmount?: string | number;
   setIcNetwork: (icNetwork: icNetworkType) => void;
-  setInputTokenSymbol: (symbol: string | null) => void;
-  setOutputTokenSymbol: (symbol: string | null) => void;
+  customActions: actionType;
+  setCustomAction: (customActions: actionType) => void;
   setInputAmount: (InputAmount: string | number) => void;
 }

@@ -19,10 +19,8 @@ import createSlippageSlice, {
 import createWidgetSlice, {
   icNetworkSelector,
   setIcNetworkSelector,
-  inputTokenSymbolSelector,
-  outputTokenSymbolSelector,
-  setInputTokenSymbolSelector,
-  setOutputTokenSymbolSelector,
+  setCustomActionSelector,
+  customActionSelector,
 } from "./widget.slice";
 
 export const rehydrated =
@@ -68,9 +66,7 @@ export {
   setActiveConnectionSelector,
   icNetworkSelector,
   setIcNetworkSelector,
-  inputTokenSymbolSelector,
-  outputTokenSymbolSelector,
-  setInputTokenSymbolSelector,
-  setOutputTokenSymbolSelector,
+  setCustomActionSelector,
+  customActionSelector,
 };
 export default useStore;

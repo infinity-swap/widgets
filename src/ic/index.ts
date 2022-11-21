@@ -7,16 +7,16 @@ import {
 } from "@dfinity/agent";
 import { IDL } from "@dfinity/candid";
 import { Principal } from "@dfinity/principal";
-import { useSwapProps } from "../hooks/useSwapProps";
 import { IC_ENVIRON, IC_HOST } from "../shared/constants";
 import useStore from "../store";
+
+const icNetwork = useStore.getState().icNetwork;
 
 interface IcConnectorOptions {
   host?: string;
   identity?: Identity | undefined;
   environ?: string;
 }
-
 export class IcConnector {
   private host: string;
   private identity?: Identity | undefined;
@@ -24,7 +24,6 @@ export class IcConnector {
   private environ: string;
 
   constructor(options: IcConnectorOptions | undefined = {}) {
-    const icNetwork = useStore.getState().icNetwork;
     this.host = options.host || icNetwork.icHost;
     this.identity = options.identity ?? undefined;
     this.agent = this.initAgent();
@@ -36,7 +35,8 @@ export class IcConnector {
       host: this.host,
       identity: this.identity,
     });
-    if (IC_ENVIRON === "local") {
+
+    if (icNetwork.icEnviron === "local") {
       agent.fetchRootKey();
     }
     return agent;
