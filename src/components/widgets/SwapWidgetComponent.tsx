@@ -753,7 +753,7 @@ export default function SwapWidgetComponent({
       />
 
       <div className="">
-        <div className="bg-[var(--container)] px-4 pt-5 pb-4 sm:p-4 sm:pb-4 w-[var(--width)]">
+        <div className="bg-[var(--container)] px-4 pt-5 pb-4 sm:p-4 sm:pb-4 w-[var(--width)] rounded-lg">
           {/* Header */}
           <div>
             <Header

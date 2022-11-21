@@ -1,10 +1,13 @@
 {
-  "name": "swapwidget",
+  "name": "@infinityswap/widgets",
   "version": "0.0.1",
   "description": "",
   "main": "dist/index.js",
   "unpkg": "dist/apexcharts.js",
   "jsdelivr": "dist/apexcharts.js",
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com/@infinityswapofficial"
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/infinity-swap/widgets"
@@ -26,6 +29,10 @@
   "keywords": [
     "infinityswap wallet"
   ],
+  "resolutions": {
+    "**/react": "^18.2.0",
+    "**/react-dom": "^18.2.0"
+  },
   "dependencies": {
     "@dfinity/agent": "^0.11.1",
     "@dfinity/auth-client": "^0.11.1",

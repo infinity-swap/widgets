@@ -147,7 +147,7 @@ export const SearchIcon = ({ className, onClick }: IconProps) => {
     >
       <path
         d="M10.1047 10.1047C9.13963 11.0699 7.80639 11.6668 6.33341 11.6668C3.388 11.6668 1 9.2788 1 6.3334C1 3.388 3.388 1 6.33341 1C9.27938 1 11.6668 3.388 11.6668 6.3334C11.6668 7.80611 11.0698 9.13957 10.1047 10.1047ZM10.1047 10.1047L13 13"
-        stroke="#8A9AB9"
+        stroke=""
         strokeWidth="2"
         strokeLinecap="round"
         strokeLinejoin="round"
