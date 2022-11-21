@@ -1,10 +1,13 @@
 {
-  "name": "swapwidget",
+  "name": "@infinityswap/widgets",
   "version": "0.0.1",
   "description": "",
   "main": "dist/index.js",
   "unpkg": "dist/apexcharts.js",
   "jsdelivr": "dist/apexcharts.js",
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com/@infinityswapofficial"
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/infinity-swap/widgets"
