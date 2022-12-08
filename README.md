@@ -1,4 +1,4 @@
-# InfinitySwap Widgets
+# WIP: InfinitySwap Widgets
 
 The @infinityswap/widgets package [coming soon] is an npm package of React components used to provide subsets of the Uniswap Protocol functionality in a small and configurable user interface element.
 
