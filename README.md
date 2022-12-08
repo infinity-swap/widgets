@@ -1,46 +1,30 @@
-# Getting Started with Create React App
+# InfinitySwap Widgets
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+The @infinityswap/widgets package [coming soon] is an npm package of React components used to provide subsets of the Uniswap Protocol functionality in a small and configurable user interface element.
 
-## Available Scripts
+# Swap Widget
 
-In the project directory, you can run:
+The Swap Widget bundles the whole swapping experience into a single React component that developers can easily embed in their app with a few lines of code.
 
-### `yarn start`
+You can customize the theme (colors, fonts, and more) to match the style of your application.
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+<img width="431" alt="Screenshot 2022-12-08 at 14 51 54" src="https://user-images.githubusercontent.com/25309184/206477889-ad2369bc-9240-4c07-9a28-51a224ecb8b6.png">
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+# Installation
 
-### `yarn test`
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
 
-### `yarn build`
+# Documentation
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+# Example Apps
 
-### `yarn eject`
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+# Legal notice
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+Astari encourages integrators to evaluate their own regulatory obligations when integrating this widget into their products, including, but not limited to, those related to economic or trade sanctions compliance.
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
-
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
+THE CODE (THE “CODE”) PROVIDED BY ASTARI LTD (THE “COMPANY”), WHICH INTERFACES WITH THE AUTOMATED MARKET MAKER (“AMM”), IS PROVIDED ON AN AS IS BASIS. THE COMPANY DOES NOT GIVE ANY WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO ANY WARRANTIES OF FITNESS FOR A PARTICULAR PURPOSE AND/OR NONINFRINGEMENT. IN NO EVENT SHALL THE COMPANY BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE CODE, THE AMM AND/OR THE USE OF OR OTHER DEALINGS IN THE CODE AND THE AMM.
+ 
+USERS SHOULD BE AWARE OF THE RISKS ASSOCIATED WITH USING OPEN-SOURCE CODE WHICH INCLUDE, BUT ARE NOT LIMITED TO, LACK OF SECURITY, OPERATIONAL INSUFFICIENCIES, SOFTWARE QUALITY AND COPYRIGHT INFRINGEMENT. BY USING THE CODE OR AMM USERS ACCEPT THESE RISKS. FOR THE AVOIDANCE OF DOUBT, THE COMPANY IS NOT RESPONSIBLE FOR AND ACCEPTS NO LIABILITY FOR ANY LOSS WHICH RESULTS FROM ANY SUCH RISK MATERIALISING OR ANY OTHER ISSUE WITH THE CODE OR AMM.
