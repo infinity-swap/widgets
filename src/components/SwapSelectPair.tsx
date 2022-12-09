@@ -4,6 +4,7 @@ import useStore, { accountSelector, principalSelector } from "../store";
 import { Token } from "../types";
 import Logo from "./Logo";
 import Modal from "./Modal";
+import Overlay from "./Overlay";
 import SearchInput from "./SearchInput";
 
 interface SwapSelectPairType {
@@ -45,11 +46,11 @@ export default function SwapSelectPair({
     : tokens;
 
   return (
-    <Modal isOpen={isOpen} onClose={() => onClose()} zIndex={20}>
+    <Overlay isOpen={isOpen}>
       <div className="h-full">
-        <div className="p-5 pb-0">
+        <div className="">
           <div className="w-full md:w-[324px]">
-            <Modal.Header title={title} onClose={() => onClose()} />
+            <Overlay.Header title={title} onClose={() => onClose()} />
           </div>
           <div className="flex justify-start flex-col mt-3">
             <div className="hidden sm:block h-[44px]">
@@ -80,7 +81,7 @@ export default function SwapSelectPair({
                     </div>
 
                     <div className="flex flex-col space-y-[4px]">
-                      <span className="h6-semibold text-[var(--textDark)]">
+                      <span className="h6-semibold text-[var(--textPrimary)]">
                         {token.symbol}
                       </span>
                       <span className="body-secondary-semibold text-[var(--textGrey)]">
@@ -94,6 +95,6 @@ export default function SwapSelectPair({
           })}
         </div>
       </div>
-    </Modal>
+    </Overlay>
   );
 }

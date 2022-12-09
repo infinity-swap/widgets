@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import Logo from "./Logo";
 import { DropdownIcon } from "../assets/svg/Icons";
 import { formatNum } from "../utils";
+import clsx from "clsx";
 interface InputProps {
   className?: string;
   name: string;
@@ -73,15 +74,22 @@ export default function Input({
     return formatNum({ value: num, ...formatting });
   };
 
+  const interactiveStyle = clsx(
+    name.toLowerCase() === "select token"
+      ? "bg-[var(--buttonActive)] text-[var(--textWhite)] stroke-[var(--textWhite)] "
+      : "bg-[var(--interactive)] text-[var(--textPrimary)] stroke-[var(--textPrimary)]",
+    "p-[8px] rounded-[var(--interactiveBorderRadius)]"
+  );
+
   return (
     <div>
       <div
-        className={`flex flex-col justify-center bg-[var(--inputContainer)] rounded-xl px-4 rounded-medium h-[72px] ${className}`}
+        className={`flex flex-col justify-center bg-[var(--module)] rounded-xl px-4 rounded-medium h-[72px] ${className}`}
       >
         <div className="flex justify-between items-center w-full">
           <div
             data-testid={`${testId}-dropdown-button`}
-            className="bg-[var(--interactive)]  dark:bg-dark-900 p-[8px] rounded-[var(--interactiveBorderRadius)] border border-[var(--interactiveBorder)]"
+            className={interactiveStyle}
           >
             <div className="flex items-center space-x-2">
               <span>
@@ -89,7 +97,7 @@ export default function Input({
                 <Logo symbol={name} logoURI={logo} />
               </span>
               <span
-                className={`body-primary-semibold text-[var(--textDark)] whitespace-nowrap 
+                className={`body-primary-semibold  whitespace-nowrap 
               ${disableSelection && "pr-5"}`}
                 onClick={() => renderInputClick()}
               >
@@ -98,7 +106,7 @@ export default function Input({
               <div>
                 <div className="flex items-center justify-center">
                   <DropdownIcon
-                    className="cursor-pointer"
+                    className="cursor-pointer "
                     data-testid={`${testId}-arrow`}
                     onClick={() => onInputClick()}
                   />
@@ -113,7 +121,7 @@ export default function Input({
                 placeholder="0.0"
                 value={isEditing ? value : formatNumber(value)}
                 data-testid={testId}
-                className={`h5-semibold bg-transparent relative w-full text-[var(--textDark)] text-right outline-none placeholder-[var(--textGrey)] `}
+                className={`h5-semibold bg-transparent relative w-full text-[var(--textPrimary)] text-right outline-none placeholder-[var(--textGrey)] `}
                 type="number"
                 readOnly={readOnly}
                 onChange={(e) =>

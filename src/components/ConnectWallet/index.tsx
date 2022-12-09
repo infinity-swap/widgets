@@ -25,6 +25,7 @@ import { Principal } from "@dfinity/principal";
 import Loader from "../Loader";
 import useCanisterIds from "../../hooks/useCanisterIds";
 import { IC_HOST } from "../../shared/constants";
+import Overlay from "../Overlay";
 
 interface Step1Type {
   connectedTo: string | null;
@@ -88,7 +89,7 @@ const RenderStep2 = ({
       {loading && (
         <div className="w-full box-border flex items-center my-4 p-2 rounded-md bg-secondary-100 space-x-2">
           <Loader />
-          <span className="body-secondary text-[var(--textDark)]">
+          <span className="body-secondary text-[var(--textPrimary)]">
             Initializing...
           </span>
         </div>
@@ -99,7 +100,7 @@ const RenderStep2 = ({
             Error connecting
           </span>
           <span
-            className="body-secondary text-[var(--textDark)] bg-secondary-200 rounded-[8px] p-2 cursor-pointer"
+            className="body-secondary text-[var(--textPrimary)] bg-secondary-200 rounded-[8px] p-2 cursor-pointer"
             onClick={(e) => onWalletConnect(wallet!)}
           >
             Try Again
@@ -111,10 +112,10 @@ const RenderStep2 = ({
           {wallet?.Icon && <wallet.Icon alt="" className="w-2/3 h-2/3" />}
         </div>
         <div className="flex flex-col">
-          <span className="h6-semibold text-[var(--textDark)] uppercase">
+          <span className="h6-semibold text-[var(--textPrimary)] uppercase">
             {wallet?.name}
           </span>
-          <span className="body-secondary  text-[var(--textDark)]">
+          <span className="body-secondary  text-[var(--textPrimary)]">
             Easy to use browser extension
           </span>
         </div>
@@ -303,13 +304,9 @@ export default function ConnectWallet() {
   };
 
   return (
-    <Modal
-      isOpen={showModalType === "connectWallet"}
-      onClose={() => onClose()}
-      zIndex={20}
-    >
-      <div className="w-full md:w-[324px] p-5">
-        <Modal.Header title="Select Wallet" onClose={() => onClose()} />
+    <Overlay isOpen={showModalType === "connectWallet"}>
+      <div className="w-full md:w-[324px]">
+        <Overlay.Header title="Select Wallet" onClose={() => onClose()} />
         <div>
           <TermsAgreeField
             step={walletStep}
@@ -337,6 +334,6 @@ export default function ConnectWallet() {
           )}
         </div>
       </div>
-    </Modal>
+    </Overlay>
   );
 }

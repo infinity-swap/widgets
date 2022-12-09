@@ -4,18 +4,21 @@
 
 .swap-widget.light {
   --primary: #752764;
+  --module: #eff1f4;
+  --buttonActive: #752764;
   --fontFamily: ;
   --error: rgb(255 42 87);
   --inputContainer: rgba(138, 154, 185, 0.1);
   --inputBorder: rgba(138, 154, 185, 0.1);
-  --container: #fff;
-  --dialog: #fff;
-  --textDark: #090308;
+  --container: #ffffff;
+  --dialog: #ffffff;
+  --textPrimary: #00013a;
+  --textSecondary: #606775;
   --textWhite: #fff;
   --textGrey: #8a9ab9;
   --disabled: rgba(232, 235, 241, 1);
-  --interactive: #ffffff;
-  --interactiveBorder: rgba(138, 154, 185, 0.2);
+  --interactive: #d7d9e0;
+  --interactiveBorder: #d7d9e0;
   --interactiveBorderRadius: 9999px;
   --placeholder: ;
   --width: 360px;
@@ -29,7 +32,7 @@
   --inputBorder: rgba(138, 154, 185, 0.1);
   --container: #fff;
   --dialog: #fff;
-  --textDark: #090308;
+  --textPrimary: #090308;
   --textWhite: #fff;
   --textGrey: #8a9ab9;
   --disabled: rgba(232, 235, 241, 1);

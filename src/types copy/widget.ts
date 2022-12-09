@@ -17,7 +17,7 @@ export interface Theme {
   fontFamily?: string;
   inputContainer?: string;
   inputBorder?: string;
-  textDark?: string;
+  textPrimary?: string;
   textLight?: string;
   textGrey?: string;
   disabled?: string;

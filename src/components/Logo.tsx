@@ -19,8 +19,8 @@ export default function Logo({ logoURI, symbol }: LogoProps) {
       />
     );
   }
-  if (symbol?.toLowerCase() === "select") {
-    symbol = "S";
+  if (symbol?.toLowerCase() === "select token") {
+    return null;
   }
   return (
     <img

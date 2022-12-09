@@ -50,7 +50,7 @@ const TermsAgreeField = ({
             </span>
           )}
           <label htmlFor="terms" className="flex items-center">
-            <span className="body-secondary-semibold text-[var(--textDark)]">
+            <span className="body-secondary-semibold text-[var(--textPrimary)]">
               <span>
                 By connecting a wallet, you agree to Infinity swap{" "}
                 <a

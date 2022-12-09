@@ -72,7 +72,7 @@ export default function WalletField({
               <wallet.Icon alt="" className="w-2/3 h-2/3" />
             </div>
           )}
-          <span className="body-primary-semibold text-[var(--textDark)]">
+          <span className="body-primary-semibold text-[var(--textPrimary)]">
             {wallet?.name}
           </span>
         </div>
