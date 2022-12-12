@@ -1,11 +1,13 @@
 import React from "react";
 import clsx from "clsx";
 import { ArrowLeftIcon, CloseIcon } from "../assets/svg/Icons";
+import { Footer } from "./Footer";
 
 interface OverlayProps {
   isOpen?: boolean;
   zIndex?: number;
   children?: JSX.Element;
+  showFooter?: boolean;
 }
 
 interface HeaderProps {
@@ -33,7 +35,12 @@ const Header = ({ title, onClose, children }: HeaderProps) => {
   );
 };
 
-function Overlay({ isOpen = false, children, zIndex = 10 }: OverlayProps) {
+function Overlay({
+  isOpen = false,
+  children,
+  zIndex = 10,
+  showFooter = false,
+}: OverlayProps) {
   const show = false;
   const overlayStyle = clsx(
     isOpen ? "bottom-0 h-full" : "h-0 bottom-[100%]  ",
@@ -42,9 +49,16 @@ function Overlay({ isOpen = false, children, zIndex = 10 }: OverlayProps) {
 
   return (
     <div className={overlayStyle}>
-      <div className="p-4">
+      <div className="p-4 pb-0">
         <div>{children}</div>
       </div>
+      {showFooter && (
+        <div className="absolute bottom-1 left-[50%] -translate-x-2/4">
+          <div>
+            <Footer />
+          </div>
+        </div>
+      )}
     </div>
   );
 }

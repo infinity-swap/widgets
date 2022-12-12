@@ -7,7 +7,7 @@ import React, {
 } from "react";
 import { Controller, useForm } from "react-hook-form";
 import Header from "../Header";
-import Input from "../Input";
+import Input from "../SwapInput";
 import useStore, {
   accountSelector,
   connectedToSelector,
@@ -73,6 +73,7 @@ import { TransactionStatus } from "../TransactionStatus";
 import { Footer } from "../Footer";
 import { SwapSummary } from "../SwapSummary";
 import { InfoLabel } from "../InfoLabel";
+import SwapSettings from "../Settings";
 
 const WhichToken = {
   IN: 1,
@@ -192,6 +193,8 @@ export default function SwapWidgetComponent({
   const [isLoading, setIsLoading] = useState(false);
   const [swapStatus, setSwapStatus] = useState(SwapPending);
   const [showSummary, setShowSummary] = useState(false);
+  const [showSetting, toggleSettings] = useState(false);
+
   setCSSVariables(theme);
 
   useEffect(() => {
@@ -782,6 +785,10 @@ export default function SwapWidgetComponent({
           />
           <SwapSummary
             isOpen={showSummary}
+            inToken={inToken}
+            outToken={outToken}
+            inAmount={inAmount}
+            outAmount={outAmount}
             onClose={() => setShowSummary(false)}
             confirmSwap={() => onSwap()}
           />
@@ -794,13 +801,25 @@ export default function SwapWidgetComponent({
             onClose={() => setIsLoading(false)}
             status={swapStatus}
           />
+          <Controller
+            name="slippage"
+            control={control}
+            render={({ field }) => (
+              <SwapSettings
+                slippage={field.value}
+                setSlippage={field.onChange}
+                isOpen={showSetting}
+                onClose={() => toggleSettings((prev) => !prev)}
+              />
+            )}
+          />
 
           {/* Header */}
           <div>
             <Header
               showWalletHandler={showWalletHandler}
-              slippage={0.1}
-              onOpenSettings={() => {}}
+              slippage={slippage}
+              onOpenSettings={() => toggleSettings((prev) => !prev)}
             />
           </div>
           <div>

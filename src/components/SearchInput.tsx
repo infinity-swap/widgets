@@ -12,7 +12,7 @@ export default function SearchInput({ ...rest }: SearchInputProps) {
       <input
         {...rest}
         type="text"
-        className="w-full h-ful outline-0 bg-transparent text-secondary-800 font-medium"
+        className="w-full h-ful outline-0 bg-transparent text-[var(--textSecondary)] font-medium"
       ></input>
     </div>
   );
