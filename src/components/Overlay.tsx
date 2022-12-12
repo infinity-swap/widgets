@@ -36,15 +36,13 @@ const Header = ({ title, onClose, children }: HeaderProps) => {
 function Overlay({ isOpen = false, children, zIndex = 10 }: OverlayProps) {
   const show = false;
   const overlayStyle = clsx(
-    isOpen
-      ? "bottom-0 h-full  overflow-scroll"
-      : "h-0 bottom-[100%]  overflow-hidden",
-    "absolute  left-0 right-0 w-full  bg-[var(--container)] transition-all duration-500 ease z-10"
+    isOpen ? "bottom-0 h-full" : "h-0 bottom-[100%]  ",
+    "absolute  left-0 right-0 w-full overflow-hidden bg-[var(--container)] transition-all duration-500 ease z-10"
   );
 
   return (
     <div className={overlayStyle}>
-      <div className="pt-5 pb-4 sm:p-4 sm:pb-4 ">
+      <div className="p-4">
         <div>{children}</div>
       </div>
     </div>

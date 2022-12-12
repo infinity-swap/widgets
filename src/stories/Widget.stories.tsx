@@ -48,7 +48,7 @@ export const StoryChangingTheTheme = () => {
         </button>
         <button onClick={() => changeTheme(darkTheme)}>dark Theme</button>
       </div>
-      <div className="border">
+      <div className="">
         <SwapWidget
           theme={theme}
           icNetwork={{

@@ -5,6 +5,104 @@ export interface IconProps {
   onClick?: () => void;
 }
 
+export const InfoIcon = ({ onClick, className }: IconProps) => {
+  return (
+    <svg
+      onClick={onClick}
+      className={className}
+      width="16"
+      height="16"
+      viewBox="0 0 16 16"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <g clip-path="url(#clip0_5372_83692)">
+        <path
+          d="M7.99995 15.2C4.01835 15.2 0.799952 11.9737 0.799952 7.99998C0.799953 4.02486 4.01835 0.79998 7.99995 0.79998C11.9744 0.799981 15.2 4.02486 15.2 7.99998C15.2 11.9737 11.9744 15.2 7.99995 15.2ZM7.99995 5.88966C8.34555 5.88966 8.62635 5.60886 8.62635 5.26326C8.62635 4.91766 8.34555 4.62966 7.99275 4.62966C7.64715 4.62966 7.36635 4.91766 7.36635 5.26326C7.36635 5.60886 7.64715 5.88966 7.99995 5.88966ZM7.99995 11.3624C8.34555 11.3624 8.63355 11.0737 8.63355 10.7288L8.63355 7.54638C8.63355 7.20006 8.34555 6.91998 7.99995 6.91998C7.65435 6.91998 7.37355 7.20006 7.37355 7.54638L7.37355 10.7288C7.37355 11.0737 7.65435 11.3624 7.99995 11.3624Z"
+          fill=""
+        />
+      </g>
+      <defs>
+        <clipPath id="clip0_5372_83692">
+          <rect width="16" height="16" fill="white" />
+        </clipPath>
+      </defs>
+    </svg>
+  );
+};
+
+export const SuccessIcon = ({ onClick, className }: IconProps) => {
+  return (
+    <svg
+      onClick={onClick}
+      className={className}
+      width="80"
+      height="80"
+      viewBox="0 0 80 80"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <circle cx="40" cy="40" r="40" fill="#D2F9F4" />
+      <path
+        d="M53 30.7143L35.125 49.2857L27 40.8441"
+        stroke="#0DA999"
+        strokeWidth="4"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+};
+
+export const LoadingIcon = ({ onClick, className }: IconProps) => {
+  return (
+    <svg
+      onClick={onClick}
+      className={className}
+      width="38"
+      height="38"
+      viewBox="0 0 38 38"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <defs>
+        <linearGradient x1="8.042%" y1="0%" x2="65.682%" y2="23.865%" id="a">
+          <stop stopColor="#fff" stopOpacity="0" offset="0%" />
+          <stop stopColor="#fff" stopOpacity=".631" offset="63.146%" />
+          <stop stopColor="#fff" offset="100%" />
+        </linearGradient>
+      </defs>
+      <g fill="none" fillRule="evenodd">
+        <g transform="translate(1 1)">
+          <path
+            d="M36 18c0-9.94-8.06-18-18-18"
+            id="Oval-2"
+            stroke=""
+            strokeWidth="2"
+          >
+            <animateTransform
+              attributeName="transform"
+              type="rotate"
+              from="0 18 18"
+              to="360 18 18"
+              dur="0.9s"
+              repeatCount="indefinite"
+            />
+          </path>
+          <circle fill="#fff" cx="36" cy="18" r="1">
+            <animateTransform
+              attributeName="transform"
+              type="rotate"
+              from="0 18 18"
+              to="360 18 18"
+              dur="0.9s"
+              repeatCount="indefinite"
+            />
+          </circle>
+        </g>
+      </g>
+    </svg>
+  );
+};
 export const WalletIcon = ({ onClick, className }: IconProps) => {
   return (
     <svg
@@ -23,7 +121,7 @@ export const WalletIcon = ({ onClick, className }: IconProps) => {
     </svg>
   );
 };
-export const SettingsIcon = ({ onClick, className }) => {
+export const SettingsIcon = ({ onClick, className }: IconProps) => {
   return (
     <svg
       onClick={onClick}
@@ -42,7 +140,34 @@ export const SettingsIcon = ({ onClick, className }) => {
     </svg>
   );
 };
-
+export const ArrowRightIcon = ({ className, onClick }: IconProps) => {
+  return (
+    <svg
+      onClick={onClick}
+      className={className}
+      width="16"
+      height="16"
+      viewBox="0 0 16 16"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        d="M3.20005 8L12.8 8"
+        stroke=""
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M8.00005 3.19999L12.8 7.99999L8.00005 12.8"
+        stroke=""
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+};
 export const ArrowLeftIcon = ({ className, onClick }: IconProps) => {
   return (
     <svg
@@ -134,21 +259,21 @@ export const ErrorIcon = ({ className, onClick }: IconProps) => {
     >
       <path
         d="M8.57465 3.21684L1.51632 15.0002C1.37079 15.2522 1.29379 15.5379 1.29298 15.8289C1.29216 16.12 1.36756 16.4061 1.51167 16.6589C1.65579 16.9118 1.86359 17.1225 2.11441 17.27C2.36523 17.4176 2.65032 17.497 2.94132 17.5002H17.058C17.349 17.497 17.6341 17.4176 17.8849 17.27C18.1357 17.1225 18.3435 16.9118 18.4876 16.6589C18.6317 16.4061 18.7071 16.12 18.7063 15.8289C18.7055 15.5379 18.6285 15.2522 18.483 15.0002L11.4247 3.21684C11.2761 2.97193 11.0669 2.76944 10.8173 2.62891C10.5677 2.48838 10.2861 2.41455 9.99965 2.41455C9.71321 2.41455 9.43159 2.48838 9.18199 2.62891C8.93238 2.76944 8.72321 2.97193 8.57465 3.21684V3.21684Z"
-        stroke="#FF2A57"
+        stroke=""
         strokeWidth="2"
         strokeLinecap="round"
         strokeLinejoin="round"
       />
       <path
         d="M10 7.5V10.8333"
-        stroke="#FF2A57"
+        stroke=""
         strokeWidth="2"
         strokeLinecap="round"
         strokeLinejoin="round"
       />
       <path
         d="M10 14.1665H10.0083"
-        stroke="#FF2A57"
+        stroke=""
         strokeWidth="2"
         strokeLinecap="round"
         strokeLinejoin="round"

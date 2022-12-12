@@ -71,6 +71,8 @@ import useTokens, { useTokensWithUserBalance } from "../../hooks/useTokens";
 import Overlay from "../Overlay";
 import { TransactionStatus } from "../TransactionStatus";
 import { Footer } from "../Footer";
+import { SwapSummary } from "../SwapSummary";
+import { InfoLabel } from "../InfoLabel";
 
 const WhichToken = {
   IN: 1,
@@ -86,16 +88,6 @@ interface FormValues {
   outAmount: number | string;
 }
 
-const InfoLabel = ({ message, Icon }: { message: string; Icon: ReactNode }) => {
-  return (
-    <div className="flex items-center h-full  bg-[var(--module)] p-2 rounded-xl">
-      <div>{Icon}</div>
-      <div className="pl-2 text-xs capitalize text-[var(--textPrimary)] font-medium">
-        Connect your wallet to swap
-      </div>
-    </div>
-  );
-};
 const SwapSuccess = {
   title: "Transaction Successful",
   type: "success",
@@ -199,6 +191,7 @@ export default function SwapWidgetComponent({
   const isMountedRef = useRef(true);
   const [isLoading, setIsLoading] = useState(false);
   const [swapStatus, setSwapStatus] = useState(SwapPending);
+  const [showSummary, setShowSummary] = useState(false);
   setCSSVariables(theme);
 
   useEffect(() => {
@@ -787,14 +780,11 @@ export default function SwapWidgetComponent({
             onChange={onSelectToken}
             onClose={() => toggleSelectPair((prev) => !prev)}
           />
-          {/* <ProgressTracker
-            //isOpen={pTracker.open!}
-            isOpen={true}
-            onClose={onRequestClose}
-            steps={pTracker.steps}
-            activeStep={pTracker.activeStep!}
-            message={pTracker.title!}
-          /> */}
+          <SwapSummary
+            isOpen={showSummary}
+            onClose={() => setShowSummary(false)}
+            confirmSwap={() => onSwap()}
+          />
           <TransactionStatus
             isOpen={isLoading}
             inToken={inToken}
@@ -942,7 +932,7 @@ export default function SwapWidgetComponent({
                   size="full"
                   className="w-full h-[52px] rounded-[16px]"
                   data-testid="swap-btn"
-                  onClick={onSwap}
+                  onClick={() => setShowSummary(true)}
                 >
                   {getButtonText()}
                 </Button>

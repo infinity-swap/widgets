@@ -26,7 +26,7 @@ interface TransactionStatusProps {
   onClose: () => void;
 }
 
-const TokenWithAmount = ({ token, amount }) => {
+export const TokenWithAmount = ({ token, amount }) => {
   return (
     <div className="flex items-center space-x-2">
       <div>

@@ -52,8 +52,9 @@ export default function SwapSelectPair({
           <div className="w-full md:w-[324px]">
             <Overlay.Header title={title} onClose={() => onClose()} />
           </div>
+
           <div className="flex justify-start flex-col mt-3">
-            <div className="hidden sm:block h-[44px]">
+            <div className="h-[44px]">
               <SearchInput
                 placeholder="Search name or paste address"
                 onChange={(e) => setSearch(e.target.value)}
@@ -61,7 +62,7 @@ export default function SwapSelectPair({
             </div>
           </div>
         </div>
-        <div className="hidden sm:block border border-solid border-[var(--interactiveBorder)] mt-4 mb-1" />
+        <div className="border border-solid border-[var(--interactiveBorder)] mt-4 mb-1" />
         <div className="w-full flex flex-col max-h-[250px]  sm:max-h-[188px] overflow-y-scroll items-center px-[12px] pt-0 sm:pt-[16px]">
           {ftokens.map((token, index) => {
             return (
