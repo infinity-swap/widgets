@@ -9,7 +9,7 @@ import useStore, {
   setAccountSelector,
 } from "../../store";
 import { WALLET_IDS } from "../../utils";
-import Modal from "../Modal";
+import Overlay from "../Overlay";
 
 export const getWallet = (id: string | null) => {
   let wallet = "";
@@ -55,13 +55,9 @@ export default function Account() {
 
   return (
     <>
-      <Modal
-        isOpen={showModalType === "account"}
-        onClose={() => toggleConnectModal("")}
-        zIndex={20}
-      >
-        <div className="w-full md:w-[324px] p-5">
-          <Modal.Header
+      <Overlay isOpen={showModalType === "account"} zIndex={20}>
+        <div className="w-full md:w-[324px]">
+          <Overlay.Header
             title="Account"
             onClose={() => toggleConnectModal("")}
           />
@@ -96,7 +92,7 @@ export default function Account() {
             </div>
           </div>
         </div>
-      </Modal>
+      </Overlay>
     </>
   );
 }

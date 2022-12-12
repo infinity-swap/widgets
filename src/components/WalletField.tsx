@@ -29,7 +29,7 @@ export const WalletFieldWrapper = ({
   const className = clsx(
     isActive ? "bg-secondary-500 justify-between" : "bg-secondary-100",
     disabled ? "cursor-not-allowed" : "cursor-pointer",
-    "flex items-center w-full h-auto p-[5%] my-2 mx-0 text-sm rounded-[8px]"
+    "flex items-center w-full h-full my-2 mx-0 text-sm rounded-[8px] pl-3"
   );
   return (
     <div id={`connect${name}`} className={className}>
@@ -47,6 +47,7 @@ export default function WalletField({
 }: WalletFieldType) {
   return (
     <div
+      className="bg-[var(--module)] rounded-lg h-[56px]"
       onClick={(e) => {
         if (wallet?.disabled) {
           return;

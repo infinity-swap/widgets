@@ -1,4 +1,10 @@
-import React, { useState, useContext, useEffect, useRef } from "react";
+import React, {
+  useState,
+  useContext,
+  useEffect,
+  useRef,
+  ReactNode,
+} from "react";
 import { Controller, useForm } from "react-hook-form";
 import Header from "../Header";
 import Input from "../Input";
@@ -9,7 +15,6 @@ import useStore, {
   principalSelector,
   slippageSelector,
 } from "../../store";
-import Modal from "../Modal";
 import Button from "../Button";
 import { ConnectWalletContext } from "../../contexts/ConnectWallet";
 import ConnectWallet from "../ConnectWallet";
@@ -20,7 +25,7 @@ import {
   useOutSwapParameters,
 } from "../../hooks/useSwapParameters";
 import debounce from "lodash.debounce";
-import { ArrowDownIcon } from "../../assets/svg/Icons";
+import { ArrowDownIcon, ErrorIcon } from "../../assets/svg/Icons";
 import { formatNum, parsePairError, toActual, toDecimal } from "../../utils";
 import Loader from "../Loader";
 import {
@@ -64,6 +69,8 @@ import { SubAccount } from "../../ic/account";
 import { ThemeContext } from "../../contexts/themeContext";
 import useTokens, { useTokensWithUserBalance } from "../../hooks/useTokens";
 import Overlay from "../Overlay";
+import { TransactionStatus } from "../TransactionStatus";
+import { Footer } from "../Footer";
 
 const WhichToken = {
   IN: 1,
@@ -79,6 +86,30 @@ interface FormValues {
   outAmount: number | string;
 }
 
+const InfoLabel = ({ message, Icon }: { message: string; Icon: ReactNode }) => {
+  return (
+    <div className="flex items-center h-full  bg-[var(--module)] p-2 rounded-xl">
+      <div>{Icon}</div>
+      <div className="pl-2 text-xs capitalize text-[var(--textPrimary)] font-medium">
+        Connect your wallet to swap
+      </div>
+    </div>
+  );
+};
+const SwapSuccess = {
+  title: "Transaction Successful",
+  type: "success",
+};
+
+const SwapError = {
+  title: "Something went wrong.",
+  type: "error",
+};
+
+const SwapPending = {
+  title: "Transaction pending",
+  type: "pending",
+};
 const SwapSteps = [
   {
     title: "Interact with canisters",
@@ -166,7 +197,8 @@ export default function SwapWidgetComponent({
   const [emptyLiquidity, setEmptyLiquidity] = useState(false);
   const connectedTo = useStore(connectedToSelector);
   const isMountedRef = useRef(true);
-  const [isOpen, setIsOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [swapStatus, setSwapStatus] = useState(SwapPending);
   setCSSVariables(theme);
 
   useEffect(() => {
@@ -710,7 +742,7 @@ export default function SwapWidgetComponent({
   };
 
   const getButtonText = () => {
-    let text = "Confirm Order";
+    let text = "Review Swap";
 
     const message = Object.values(errors)?.[0]?.message;
     if (message) {
@@ -754,6 +786,23 @@ export default function SwapWidgetComponent({
             filter={onFilter}
             onChange={onSelectToken}
             onClose={() => toggleSelectPair((prev) => !prev)}
+          />
+          {/* <ProgressTracker
+            //isOpen={pTracker.open!}
+            isOpen={true}
+            onClose={onRequestClose}
+            steps={pTracker.steps}
+            activeStep={pTracker.activeStep!}
+            message={pTracker.title!}
+          /> */}
+          <TransactionStatus
+            isOpen={isLoading}
+            inToken={inToken}
+            outToken={outToken}
+            inAmount={inAmount}
+            outAmount={outAmount}
+            onClose={() => setIsLoading(false)}
+            status={swapStatus}
           />
 
           {/* Header */}
@@ -857,7 +906,7 @@ export default function SwapWidgetComponent({
                         : formatNum({ value: outToken?.price, decimals: 4 })
                     }
                     logo={outToken?.logo}
-                    name={outToken?.symbol ?? "Select "}
+                    name={outToken?.symbol ?? "Select Token"}
                     value={field.value}
                     min={0}
                     onInputClick={() => onDropDownClick(WhichToken.OUT)}
@@ -866,14 +915,19 @@ export default function SwapWidgetComponent({
               />
             </div>
             <div className="mt-2">
+              {!principalId && !isFetchingPrice && (
+                <InfoLabel
+                  Icon={
+                    <ErrorIcon className="cursor-pointer stroke-[var(--error)] h-[16px] w-[16px]" />
+                  }
+                  message="Connect your wallet to swap"
+                />
+              )}
               {isFetchingPrice && (
-                <div className="flex items-center text-[var(--textPrimary)]">
-                  <Loader height={25} width={25} />
-                  <span className="pl-2 capitalize">Fetching prices....</span>
-                </div>
+                <InfoLabel Icon={<Loader />} message="Fetching prices...." />
               )}
             </div>
-            <div className="mt-4">
+            <div className="pt-4">
               {!principalId ? (
                 <Button
                   onClick={showWalletHandler}
@@ -895,25 +949,21 @@ export default function SwapWidgetComponent({
               ) : (
                 <Button
                   applyDisabledStyle
+                  variant="secondary"
                   size="full"
                   data-testid="swap-swtconfirm-button"
-                  className="mt-7 p-4 h6-semibold dark:border-none w-full h-[52px] rounded-[16px]"
+                  className=" w-full h-[52px] rounded-[16px]"
                 >
                   {getButtonText()}
                 </Button>
               )}
             </div>
+            <div className="pt-3">
+              <Footer />
+            </div>
           </div>
         </div>
       </div>
-
-      <ProgressTracker
-        isOpen={pTracker.open!}
-        onClose={onRequestClose}
-        steps={pTracker.steps}
-        activeStep={pTracker.activeStep!}
-        message={pTracker.title!}
-      />
     </div>
   );
 }

@@ -31,39 +31,41 @@ const TermsAgreeField = ({
 
   return (
     <>
-      <div className="py-4">
-        <div
-          className="w-full rounded-[8px] box-border flex justify-between items-start p-[5%] font-semibold bg-secondary-100 leading-6 text-[0.9rem]"
-          onClick={() => onTermChange(!termAccepted)}
-        >
-          {(!principalId || step === 2) && (
-            <span className="px-3">
-              <input
-                type="checkbox"
-                disabled={step === 2}
-                {...defaultChecked}
-                id="terms"
-                className="space-x-1 accent-primary-500 w-[16px] h-[16px]"
-                onChange={(e) => onTermChange(e.target.checked)}
-                checked={termAccepted}
-              />
-            </span>
-          )}
-          <label htmlFor="terms" className="flex items-center">
-            <span className="body-secondary-semibold text-[var(--textPrimary)]">
+      <div className="bg-[var(--module)] rounded-lg">
+        <div className="p-3">
+          <div
+            className="w-full rounded-[8px] box-border space-x-2 flex justify-between items-start  font-semibold bg-secondary-100 leading-6 text-[0.9rem]"
+            onClick={() => onTermChange(!termAccepted)}
+          >
+            {(!principalId || step === 2) && (
               <span>
-                By connecting a wallet, you agree to Infinity swap{" "}
-                <a
-                  href="https://infinityswap-documentation.web.app/docs/Infinity-swap-webapp/Terms%20of%20Use/"
-                  target="_blank"
-                  className="text-primary-800"
-                  rel="noreferrer"
-                >
-                  <span> Terms of Service.</span>
-                </a>{" "}
+                <input
+                  type="checkbox"
+                  disabled={step === 2}
+                  {...defaultChecked}
+                  id="terms"
+                  className="space-x-1 accent-primary-500 w-[16px] h-[16px]"
+                  onChange={(e) => onTermChange(e.target.checked)}
+                  checked={termAccepted}
+                />
               </span>
-            </span>
-          </label>
+            )}
+            <label htmlFor="terms" className="flex items-center">
+              <span className="body-secondary-semibold text-[var(--textPrimary)]">
+                <span>
+                  By connecting a wallet, you agree to Infinity swap{" "}
+                  <a
+                    href="https://infinityswap-documentation.web.app/docs/Infinity-swap-webapp/Terms%20of%20Use/"
+                    target="_blank"
+                    className="text-[var(--primaryActive)]"
+                    rel="noreferrer"
+                  >
+                    <span> Terms of Service.</span>
+                  </a>{" "}
+                </span>
+              </span>
+            </label>
+          </div>
         </div>
       </div>
       {showWarning && (

@@ -76,7 +76,7 @@ export default function Input({
 
   const interactiveStyle = clsx(
     name.toLowerCase() === "select token"
-      ? "bg-[var(--buttonActive)] text-[var(--textWhite)] stroke-[var(--textWhite)] "
+      ? "bg-[var(--primaryActive)] text-[var(--textWhite)] stroke-[var(--textWhite)] "
       : "bg-[var(--interactive)] text-[var(--textPrimary)] stroke-[var(--textPrimary)]",
     "p-[8px] rounded-[var(--interactiveBorderRadius)]"
   );

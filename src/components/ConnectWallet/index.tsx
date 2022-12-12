@@ -52,27 +52,33 @@ const RenderStep1 = ({
 }: Step1Type) => {
   return (
     <>
-      <div className="w-full box-border">
-        {WALLETS.map((wallet) => (
-          <WalletField
-            isActive={connectedTo === wallet.id}
-            currentWalletId={currentWalletId}
-            wallet={wallet}
-            key={wallet.id}
-            onClick={onWalletConnect}
-          />
-        ))}
+      <div>
+        <div className="w-full box-border">
+          {WALLETS.map((wallet) => (
+            <WalletField
+              isActive={connectedTo === wallet.id}
+              currentWalletId={currentWalletId}
+              wallet={wallet}
+              key={wallet.id}
+              onClick={onWalletConnect}
+            />
+          ))}
+        </div>
+        <div className="pt-8">
+          <div>
+            <a
+              href="https://www.blog.infinityswap.one/getting-started-with-infinityswap-wallet-a-step-by-step-guide/"
+              target="_blank"
+              className="block text-center"
+              rel="noreferrer"
+            >
+              <span className="cursor-pointer body-secondary-semibold text-[var(--primary)]">
+                Learn how to connect your wallet
+              </span>
+            </a>
+          </div>
+        </div>
       </div>
-      <a
-        href="https://www.blog.infinityswap.one/getting-started-with-infinityswap-wallet-a-step-by-step-guide/"
-        target="_blank"
-        className="block text-center"
-        rel="noreferrer"
-      >
-        <span className="cursor-pointer body-secondary-semibold text-[var(--primary)]">
-          Learn how to connect your wallet
-        </span>
-      </a>
     </>
   );
 };
@@ -87,7 +93,7 @@ const RenderStep2 = ({
   return (
     <>
       {loading && (
-        <div className="w-full box-border flex items-center my-4 p-2 rounded-md bg-secondary-100 space-x-2">
+        <div className="w-full box-border flex items-center my-4 p-2 rounded-md bg-[var(--module)] space-x-2">
           <Loader />
           <span className="body-secondary text-[var(--textPrimary)]">
             Initializing...
@@ -95,7 +101,7 @@ const RenderStep2 = ({
         </div>
       )}
       {error && (
-        <div className="w-full box-border flex items-center my-4 p-2 rounded-[8px] bg-secondary-100 border border-red-500">
+        <div className="w-full box-border flex items-center my-4 p-2 rounded-[8px] bg-[var(--module)] border border-red-500">
           <span className="body-secondary mr-4 text-[var(--error)]">
             Error connecting
           </span>
@@ -107,7 +113,7 @@ const RenderStep2 = ({
           </span>
         </div>
       )}
-      <div className="flex my-4 p-2 rounded-[8px] bg-secondary-100 items-center">
+      <div className="flex my-4 p-2 rounded-[8px] bg-[var(--module)] items-center">
         <div className="flex items-center justify-center rounded-full dark:bg-transparent mr-2 bg-white w-[32px] h-[32px] shadow-lg">
           {wallet?.Icon && <wallet.Icon alt="" className="w-2/3 h-2/3" />}
         </div>
@@ -307,7 +313,7 @@ export default function ConnectWallet() {
     <Overlay isOpen={showModalType === "connectWallet"}>
       <div className="w-full md:w-[324px]">
         <Overlay.Header title="Select Wallet" onClose={() => onClose()} />
-        <div>
+        <div className="pt-4">
           <TermsAgreeField
             step={walletStep}
             termAccepted={termAccepted}
