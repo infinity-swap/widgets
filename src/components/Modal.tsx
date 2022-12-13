@@ -1,5 +1,5 @@
 import React from "react";
-// import CloseIcon from "../assets/svg/close.svg";
+import { CloseIcon } from "../assets/svg/Icons";
 
 interface ModalProps {
   isOpen?: boolean;
@@ -10,14 +10,14 @@ interface ModalProps {
 const Header = ({ title, onClose }: { title: string; onClose: () => void }) => {
   return (
     <div className={`w-full flex justify-between items-center`}>
-      <div className={"h6-semibold text-[var(--textDark)]"}>{title}</div>
+      <div className={"h6-semibold text-[var(--textPrimary)]"}>{title}</div>
       <div>
         <div className="hidden sm:block">
-          {/*  <CloseIcon
+          <CloseIcon
             onClick={() => onClose()}
             className="w-6 h-6 cursor-pointer"
-            stroke="var(--secondary-black)"
-          /> */}
+            // stroke="var(--secondary-black)"
+          />
         </div>
       </div>
     </div>
@@ -45,7 +45,7 @@ function Modal({ isOpen = false, onClose, children, zIndex = 10 }: ModalProps) {
               ></div>
               <div className="relative w-auto my-6 mx-auto max-w-3xl">
                 {/*content*/}
-                <div className="relative transform overflow-hidden rounded-lg  bg-white text-left shadow-xl transition-all sm:my-8 ">
+                <div className="relative transform overflow-hidden rounded-lg  bg-[var(--dialog)] text-left shadow-xl transition-all sm:my-8 ">
                   {children}
                 </div>
               </div>

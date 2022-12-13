@@ -1,4 +1,6 @@
+import React from "react";
 import clsx from "clsx";
+
 import { ReactNode } from "react";
 
 interface ButtonType {
@@ -18,7 +20,7 @@ const buttonSizes: any = {
   sm: "py-2 px-3",
   md: "p-4",
   lg: "py-4 px-5",
-  full: "py-4 w-full",
+  full: "w-full",
 };
 
 export interface ButtonProps extends React.ComponentPropsWithoutRef<"button"> {
@@ -43,8 +45,8 @@ export default function Button({
     case "secondary":
       return (
         <SecondaryButton
-          className={classes}
           applyDisabledStyle={applyDisabledStyle}
+          className={classes}
           {...rest}
         >
           {children}
@@ -72,10 +74,9 @@ const PrimaryButton = ({
   ...rest
 }: VariantButtonType) => {
   const defaultStyle =
-    "bg-[var(--primary)]  text-white rounded-xl dark:bg-primary-800 dark:bg-none";
-  const hoverStyle = "hover:bg-[var(--primary)] dark:hover:bg-primary-hover";
-  const disabledStyle =
-    "bg-[var(--disabled)] dark:bg-secondary-grey-10 border-none text-secondary-800 dark:border-2 dark:border-grey-100 rounded-xl";
+    "bg-[var(--primary)] rounded-xl  text-[var(--textWhite)] font-medium text-lg";
+  const hoverStyle = "hover:bg-[var(--primaryActiveHover)]";
+  const disabledStyle = "bg-[var(--disabled)] border-none  rounded-xl";
 
   const classes = clsx(
     applyDisabledStyle ? disabledStyle : defaultStyle,
@@ -84,13 +85,7 @@ const PrimaryButton = ({
   );
 
   return (
-    <button
-      type="button"
-      className={classes}
-      disabled={disabled}
-      {...rest}
-      // style={{ background: "var(--primary)" }}
-    >
+    <button type="button" className={classes} disabled={disabled} {...rest}>
       {children}
     </button>
   );
@@ -103,11 +98,8 @@ const SecondaryButton = ({
   ...rest
 }: VariantButtonType) => {
   const defaultStyle =
-    "bg-white border-[1.5px] border-grey-300 text-primary-900 rounded-xl dark:bg-secondary-grey-10 dark:border-none";
-  const hoverStyle = "hover:bg-grey-100 text-secondary-lightblack";
-  const disabledStyle = "disabled:bg-grey-200 disabled:text-secondary-800";
-
-  const classes = clsx(defaultStyle, hoverStyle, disabledStyle, className);
+    " border border-[var(--outline)] text-[var(--textSecondary)] rounded-xl font-medium text-lg";
+  const classes = clsx(defaultStyle, className);
 
   return (
     <button type="button" className={classes} {...rest}>

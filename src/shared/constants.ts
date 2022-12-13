@@ -1,7 +1,7 @@
-export const IC_HOST = "http://localhost:8000";
-export const IC_ENVIRON = "local";
+export const IC_HOST = "https://ic0.app";
+export const IC_ENVIRON = "mainnet";
 export const CANISTER_IDS_URL =
-  "http://localhost:8001/static/canister_ids.json";
+  "https://storage.googleapis.com/dfx-server_ic/testnet/canister_ids.json";
 export const TRANSACTION_FEES = 10000;
 export const defaultDecimal = 8;
 export const MAINNET_LEDGER_CANISTER_ID = "ryjl3-tyaaa-aaaaa-aaaba-cai";

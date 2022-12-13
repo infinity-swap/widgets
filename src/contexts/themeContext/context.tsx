@@ -18,12 +18,13 @@ export const ThemeProvider = ({ children }: { children: ReactNode }) => {
           theme[key as keyof Theme]!
         );
       });
-      setThemeVariables(theme);
+      // setThemeVariables(theme);
     }
   };
-  //setCSSVariables(theme)
   return (
-    <ThemeContext.Provider value={{ themeVariables, setCSSVariables }}>
+    <ThemeContext.Provider
+      value={{ themeVariables, setCSSVariables, setThemeVariables }}
+    >
       {children}
     </ThemeContext.Provider>
   );

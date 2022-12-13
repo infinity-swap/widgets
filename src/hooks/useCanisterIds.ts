@@ -4,12 +4,16 @@ import {
   CANISTER_IDS_URL,
   MAINNET_LEDGER_CANISTER_ID,
 } from "../shared/constants";
+import { ConnectWalletContext } from "../contexts/ConnectWallet";
+import { useContext } from "react";
+import { icNetworkType } from "../types";
+import useStore, { icNetworkSelector } from "../store";
 
 type CanisterIds = { [key: string]: string };
 
-const extractCanisterIds = (data: any) => {
+const extractCanisterIds = (data: any, icNetwork: icNetworkType) => {
   const canisterIds: CanisterIds = {
-    ledger: MAINNET_LEDGER_CANISTER_ID,
+    ledger: icNetwork?.MAINNET_LEDGER_CANISTER_ID,
   };
   Object.entries(data).forEach(([key, value]: any) => {
     const actualValue = value.local ? value.local : value;
@@ -26,8 +30,9 @@ const extractCanisterIds = (data: any) => {
   return canisterIds;
 };
 
-export const fetchCanisterIds = async (url: string) => {
+export const fetchCanisterIds = async (icNetwork: icNetworkType) => {
   try {
+    const url = icNetwork?.CANISTER_IDS_URL;
     const response = await axios.get(url);
     if (response.data) {
       const data = response.data ?? {};
@@ -38,14 +43,20 @@ export const fetchCanisterIds = async (url: string) => {
         ])
       );
 
-      return extractCanisterIds(ids);
+      return extractCanisterIds(ids, icNetwork);
     }
   } catch (_) {}
 };
 
 function useCanisterIds() {
-  const url = CANISTER_IDS_URL;
-  const { data } = useQuery("canister_ids", async () => fetchCanisterIds(url));
+  const icNetwork = useStore(icNetworkSelector);
+  const { data } = useQuery(
+    "canister_ids",
+    async () => fetchCanisterIds(icNetwork),
+    {
+      enabled: !!icNetwork,
+    }
+  );
   return data ?? {};
 }
 
