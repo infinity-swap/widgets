@@ -17,8 +17,12 @@ const extractCanisterIds = (data: any, icNetwork: icNetworkType) => {
   };
   Object.entries(data).forEach(([key, value]: any) => {
     const actualValue = value.local ? value.local : value;
-    if (/ledger/.test(key)) {
+    if (key === "ledger-test" || key === "ledger_test") {
       canisterIds.ledgerTest = actualValue;
+    } else if (key === "icrc1-ledger") {
+      canisterIds.icrc1Ledger = actualValue;
+    } else if (key === "sns_ledger") {
+      canisterIds.snsLedger = actualValue;
     } else if (["token_factory", "is20-factory"].includes(key)) {
       canisterIds.tokenFactory = actualValue;
     } else if (["pair_factory", "pair-factory"].includes(key)) {
@@ -50,6 +54,7 @@ export const fetchCanisterIds = async (icNetwork: icNetworkType) => {
 
 function useCanisterIds() {
   const icNetwork = useStore(icNetworkSelector);
+  console.log("icNetwork", icNetwork);
   const { data } = useQuery(
     "canister_ids",
     async () => fetchCanisterIds(icNetwork),
