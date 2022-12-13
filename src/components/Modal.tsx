@@ -10,7 +10,7 @@ interface ModalProps {
 const Header = ({ title, onClose }: { title: string; onClose: () => void }) => {
   return (
     <div className={`w-full flex justify-between items-center`}>
-      <div className={"h6-semibold text-[var(--textDark)]"}>{title}</div>
+      <div className={"h6-semibold text-[var(--textPrimary)]"}>{title}</div>
       <div>
         <div className="hidden sm:block">
           <CloseIcon

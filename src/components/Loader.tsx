@@ -1,20 +1,11 @@
 import React from "react";
-import SpinningLoaderDark from "../assets/gif/loader-light.gif";
+import { LoadingIcon } from "../assets/svg/Icons";
 
-export default function Loader({
-  height = 20,
-  width = 20,
-}: {
-  height?: number;
-  width?: number;
-}) {
+export default function Loader({ className }: { className?: string }) {
   return (
     <div>
-      <img
-        src={SpinningLoaderDark}
-        alt="loader"
-        height={height}
-        width={width}
+      <LoadingIcon
+        className={` cursor-pointer stroke-[var(--accentActive)] h-[16px] w-[16px] ${className}`}
       />
     </div>
   );

@@ -9,7 +9,7 @@ import useStore, {
   setAccountSelector,
 } from "../../store";
 import { WALLET_IDS } from "../../utils";
-import Modal from "../Modal";
+import Overlay from "../Overlay";
 
 export const getWallet = (id: string | null) => {
   let wallet = "";
@@ -55,13 +55,9 @@ export default function Account() {
 
   return (
     <>
-      <Modal
-        isOpen={showModalType === "account"}
-        onClose={() => toggleConnectModal("")}
-        zIndex={20}
-      >
-        <div className="w-full md:w-[324px] p-5">
-          <Modal.Header
+      <Overlay isOpen={showModalType === "account"} zIndex={20}>
+        <div className="w-full md:w-[324px]">
+          <Overlay.Header
             title="Account"
             onClose={() => toggleConnectModal("")}
           />
@@ -77,7 +73,7 @@ export default function Account() {
             </span>
           </div>
           <div>
-            <div className="mt-5 h6-semibold text-[var(--textDark)]">
+            <div className="mt-5 h6-semibold text-[var(--textPrimary)]">
               Principal
             </div>
             <div className="bg-[var(--inputContainer)] flex items-center rounded-md h-[52px] mt-2">
@@ -88,7 +84,7 @@ export default function Account() {
               </div>
             </div>
             <div
-              className="flex justify-end cursor-pointer text-[var(--textDark)] body-secondary font-bold uppercase mt-2"
+              className="flex justify-end cursor-pointer text-[var(--textPrimary)] body-secondary font-bold uppercase mt-2"
               onClick={() => disconnect()}
               data-testid="disconnect-wallet"
             >
@@ -96,7 +92,7 @@ export default function Account() {
             </div>
           </div>
         </div>
-      </Modal>
+      </Overlay>
     </>
   );
 }

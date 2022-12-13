@@ -1,7 +1,13 @@
-import React, { useState, useContext, useEffect, useRef } from "react";
+import React, {
+  useState,
+  useContext,
+  useEffect,
+  useRef,
+  ReactNode,
+} from "react";
 import { Controller, useForm } from "react-hook-form";
 import Header from "../Header";
-import Input from "../Input";
+import Input from "../SwapInput";
 import useStore, {
   accountSelector,
   connectedToSelector,
@@ -9,7 +15,6 @@ import useStore, {
   principalSelector,
   slippageSelector,
 } from "../../store";
-import Modal from "../Modal";
 import Button from "../Button";
 import { ConnectWalletContext } from "../../contexts/ConnectWallet";
 import ConnectWallet from "../ConnectWallet";
@@ -20,7 +25,7 @@ import {
   useOutSwapParameters,
 } from "../../hooks/useSwapParameters";
 import debounce from "lodash.debounce";
-import { ArrowDownIcon } from "../../assets/svg/Icons";
+import { ArrowDownIcon, ErrorIcon } from "../../assets/svg/Icons";
 import { formatNum, parsePairError, toActual, toDecimal } from "../../utils";
 import Loader from "../Loader";
 import {
@@ -63,6 +68,12 @@ import Ic, { IcConnector } from "../../ic";
 import { SubAccount } from "../../ic/account";
 import { ThemeContext } from "../../contexts/themeContext";
 import useTokens, { useTokensWithUserBalance } from "../../hooks/useTokens";
+import Overlay from "../Overlay";
+import { TransactionStatus } from "../TransactionStatus";
+import { Footer } from "../Footer";
+import { SwapSummary } from "../SwapSummary";
+import { InfoLabel } from "../InfoLabel";
+import SwapSettings from "../Settings";
 
 const WhichToken = {
   IN: 1,
@@ -78,6 +89,20 @@ interface FormValues {
   outAmount: number | string;
 }
 
+const SwapSuccess = {
+  title: "Transaction Successful",
+  type: "success",
+};
+
+const SwapError = {
+  title: "Something went wrong.",
+  type: "error",
+};
+
+const SwapPending = {
+  title: "Transaction pending",
+  type: "pending",
+};
 const SwapSteps = [
   {
     title: "Interact with canisters",
@@ -165,6 +190,11 @@ export default function SwapWidgetComponent({
   const [emptyLiquidity, setEmptyLiquidity] = useState(false);
   const connectedTo = useStore(connectedToSelector);
   const isMountedRef = useRef(true);
+  const [isLoading, setIsLoading] = useState(false);
+  const [swapStatus, setSwapStatus] = useState(SwapPending);
+  const [showSummary, setShowSummary] = useState(false);
+  const [showSetting, toggleSettings] = useState(false);
+
   setCSSVariables(theme);
 
   useEffect(() => {
@@ -708,7 +738,7 @@ export default function SwapWidgetComponent({
   };
 
   const getButtonText = () => {
-    let text = "Confirm Order";
+    let text = "Review Swap";
 
     const message = Object.values(errors)?.[0]?.message;
     if (message) {
@@ -743,23 +773,53 @@ export default function SwapWidgetComponent({
 
   return (
     <div className="swap-widget light">
-      <ConnectWallet />
-      <Account />
-      <SwapSelectPair
-        isOpen={selectPair}
-        filter={onFilter}
-        onChange={onSelectToken}
-        onClose={() => toggleSelectPair((prev) => !prev)}
-      />
-
       <div className="">
-        <div className="bg-[var(--container)] px-4 pt-5 pb-4 sm:p-4 sm:pb-4 w-[var(--width)] rounded-lg">
+        <div className="bg-[var(--container)] border relative px-4 pt-5 pb-4 sm:p-4 sm:pb-4 w-[var(--width)] rounded-lg">
+          <Account />
+          <ConnectWallet />
+          <SwapSelectPair
+            isOpen={selectPair}
+            filter={onFilter}
+            onChange={onSelectToken}
+            onClose={() => toggleSelectPair((prev) => !prev)}
+          />
+          <SwapSummary
+            isOpen={showSummary}
+            inToken={inToken}
+            outToken={outToken}
+            inAmount={inAmount}
+            outAmount={outAmount}
+            onClose={() => setShowSummary(false)}
+            confirmSwap={() => onSwap()}
+          />
+          <TransactionStatus
+            isOpen={isLoading}
+            inToken={inToken}
+            outToken={outToken}
+            inAmount={inAmount}
+            outAmount={outAmount}
+            onClose={() => setIsLoading(false)}
+            status={swapStatus}
+          />
+          <Controller
+            name="slippage"
+            control={control}
+            render={({ field }) => (
+              <SwapSettings
+                slippage={field.value}
+                setSlippage={field.onChange}
+                isOpen={showSetting}
+                onClose={() => toggleSettings((prev) => !prev)}
+              />
+            )}
+          />
+
           {/* Header */}
           <div>
             <Header
               showWalletHandler={showWalletHandler}
-              slippage={0.1}
-              onOpenSettings={() => {}}
+              slippage={slippage}
+              onOpenSettings={() => toggleSettings((prev) => !prev)}
             />
           </div>
           <div>
@@ -799,7 +859,7 @@ export default function SwapWidgetComponent({
                         : null
                     }
                     logo={inToken?.logo}
-                    name={inToken?.symbol ?? "Select"}
+                    name={inToken?.symbol ?? "Select Token"}
                     value={field.value}
                     min={0}
                     onInputClick={() => onDropDownClick(WhichToken.IN)}
@@ -808,12 +868,12 @@ export default function SwapWidgetComponent({
               />
               <div
                 data-testid="swp-arrow-container"
-                className="flex justify-center items-center rounded-md absolute bg-[var(--interactive)] border border-[var(--interactiveBorder)] dark:bg-dark-900 h-[32px] w-[32px] cursor-pointer z-1 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"
+                className="flex justify-center items-center rounded-md absolute   bg-[var(--container)] dark:bg-dark-900 h-[32px] w-[32px] cursor-pointer z-1 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"
                 onClick={swapInput}
               >
-                <div className="bg-primary-200 dark:bg-dark-200 rounded-md">
+                <div className="bg-[var(--interactive)] rounded-md">
                   <ArrowDownIcon
-                    className={`fill-[var(--primary)] dark:fill-white arrow w-[24px] h-[24px] ${
+                    className={`fill-[var(--textPrimary)] dark:fill-white arrow w-[24px] h-[24px] ${
                       toggleSwitch ? "rotate-[-360deg]" : ""
                     }`}
                   />
@@ -855,7 +915,7 @@ export default function SwapWidgetComponent({
                         : formatNum({ value: outToken?.price, decimals: 4 })
                     }
                     logo={outToken?.logo}
-                    name={outToken?.symbol ?? "Select"}
+                    name={outToken?.symbol ?? "Select Token"}
                     value={field.value}
                     min={0}
                     onInputClick={() => onDropDownClick(WhichToken.OUT)}
@@ -864,16 +924,24 @@ export default function SwapWidgetComponent({
               />
             </div>
             <div className="mt-2">
+              {!principalId && !isFetchingPrice && (
+                <InfoLabel
+                  Icon={
+                    <ErrorIcon className="cursor-pointer stroke-[var(--error)] h-[16px] w-[16px]" />
+                  }
+                  message="Connect your wallet to swap"
+                />
+              )}
               {isFetchingPrice && (
-                <div className="flex items-center text-[var(--textDark)]">
-                  <Loader height={25} width={25} />
-                  <span className="pl-2 capitalize">Fetching prices....</span>
-                </div>
+                <InfoLabel Icon={<Loader />} message="Fetching prices...." />
               )}
             </div>
-            <div className="mt-2">
+            <div className="pt-4">
               {!principalId ? (
-                <Button onClick={showWalletHandler} className="w-full">
+                <Button
+                  onClick={showWalletHandler}
+                  className="w-full h-[52px] rounded-[16px]"
+                >
                   Connect Wallet
                 </Button>
               ) : isValid && !isFetchingPrice && !emptyLiquidity ? (
@@ -881,34 +949,30 @@ export default function SwapWidgetComponent({
                   disabled={!isValid}
                   applyDisabledStyle={!isValid}
                   size="full"
-                  className="mt-7 p-4 "
+                  className="w-full h-[52px] rounded-[16px]"
                   data-testid="swap-btn"
-                  onClick={onSwap}
+                  onClick={() => setShowSummary(true)}
                 >
                   {getButtonText()}
                 </Button>
               ) : (
                 <Button
                   applyDisabledStyle
+                  variant="secondary"
                   size="full"
                   data-testid="swap-swtconfirm-button"
-                  className="mt-7 dark:bg-primary-300 p-4 text-primary-900 h6-semibold dark:border-none"
+                  className=" w-full h-[52px] rounded-[16px]"
                 >
                   {getButtonText()}
                 </Button>
               )}
             </div>
+            <div className="pt-3">
+              <Footer />
+            </div>
           </div>
         </div>
       </div>
-
-      <ProgressTracker
-        isOpen={pTracker.open!}
-        onClose={onRequestClose}
-        steps={pTracker.steps}
-        activeStep={pTracker.activeStep!}
-        message={pTracker.title!}
-      />
     </div>
   );
 }

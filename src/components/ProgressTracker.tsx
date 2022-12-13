@@ -115,7 +115,7 @@ export default function ProgressTracker({
           />
         </div>
         <div className="p-6 divide-y divide-slate-300">
-          <h4 className="pb-4 font-inter h4-semibold text-[var(--textDark)]">
+          <h4 className="pb-4 font-inter h4-semibold text-[var(--textPrimary)]">
             {message}
           </h4>
           <div className="pt-4">
@@ -135,11 +135,11 @@ export default function ProgressTracker({
                     )}
                     {step.loading && <Loader height={16} width={16} />}
 
-                    <h6 className="font-inter h4-semibold text-[var(--textDark)] ml-4">
+                    <h6 className="font-inter h4-semibold text-[var(--textPrimary)] ml-4">
                       {step.title}
                     </h6>
                   </div>
-                  <p className="font-inter body-primary leading-6 ml-8 text-[var(--textDark)]">
+                  <p className="font-inter body-primary leading-6 ml-8 text-[var(--textPrimary)]">
                     {step.action}
                   </p>
                 </div>

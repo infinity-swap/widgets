@@ -4,6 +4,7 @@ import useStore, { accountSelector, principalSelector } from "../store";
 import { Token } from "../types";
 import Logo from "./Logo";
 import Modal from "./Modal";
+import Overlay from "./Overlay";
 import SearchInput from "./SearchInput";
 
 interface SwapSelectPairType {
@@ -45,14 +46,15 @@ export default function SwapSelectPair({
     : tokens;
 
   return (
-    <Modal isOpen={isOpen} onClose={() => onClose()} zIndex={20}>
+    <Overlay isOpen={isOpen}>
       <div className="h-full">
-        <div className="p-5 pb-0">
+        <div className="">
           <div className="w-full md:w-[324px]">
-            <Modal.Header title={title} onClose={() => onClose()} />
+            <Overlay.Header title={title} onClose={() => onClose()} />
           </div>
+
           <div className="flex justify-start flex-col mt-3">
-            <div className="hidden sm:block h-[44px]">
+            <div className="h-[44px]">
               <SearchInput
                 placeholder="Search name or paste address"
                 onChange={(e) => setSearch(e.target.value)}
@@ -60,7 +62,7 @@ export default function SwapSelectPair({
             </div>
           </div>
         </div>
-        <div className="hidden sm:block border border-solid border-[var(--interactiveBorder)] mt-4 mb-1" />
+        <div className="border border-solid border-[var(--interactiveBorder)] mt-4 mb-1" />
         <div className="w-full flex flex-col max-h-[250px]  sm:max-h-[188px] overflow-y-scroll items-center px-[12px] pt-0 sm:pt-[16px]">
           {ftokens.map((token, index) => {
             return (
@@ -80,7 +82,7 @@ export default function SwapSelectPair({
                     </div>
 
                     <div className="flex flex-col space-y-[4px]">
-                      <span className="h6-semibold text-[var(--textDark)]">
+                      <span className="h6-semibold text-[var(--textPrimary)]">
                         {token.symbol}
                       </span>
                       <span className="body-secondary-semibold text-[var(--textGrey)]">
@@ -94,6 +96,6 @@ export default function SwapSelectPair({
           })}
         </div>
       </div>
-    </Modal>
+    </Overlay>
   );
 }
